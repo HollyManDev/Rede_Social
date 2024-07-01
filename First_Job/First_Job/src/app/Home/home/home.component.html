@@ -1,0 +1,32 @@
+ <nav class="navBar">
+
+    <div class="coderInfo"> 
+       
+       <label class="coderName">Holy Man</label>
+       <label class="description">Coder</label>
+    
+    </div>
+
+    <div class="navBarLinks">
+
+        <ul class="navBarOption">
+            
+            <li> <a routerLink ="/HomeMain/HomeNavbar" class="linknavBar"> Home </a></li>
+            <li><a routerLink ="" class="linknavBar"> About us </a></li>
+            <li> <a routerLink ="/MainUI"  class="linknavBar"> Contact </a></li>
+            <li><a routerLink ="" class="linknavBar" > Galery </a></li>
+        
+        </ul>
+
+        <div class="buttonNavBar">
+
+            <button mat-raised-button  routerLink ="/HomeMain/Login">Sign in</button>
+            <button mat-raised-button  routerLink ="/Register" >Sign up</button>
+           
+        </div>
+
+    </div>
+        
+ </nav>
+ 
+ <router-outlet></router-outlet>

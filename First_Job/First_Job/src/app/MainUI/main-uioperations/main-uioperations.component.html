@@ -1,0 +1,90 @@
+<div class="mainChats">
+
+    <div class="leftButtons">
+       
+    </div>
+
+    <div class="headerChats">
+    
+        <div class="headerChatsElement">
+
+            <div class="OtherOptions">
+               
+                <p class="paragrafo"> My Chats</p>
+               
+                <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_horiz</mat-icon>
+                  </button>
+                  
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item>Item 1</button>
+                    <button mat-menu-item>Item 2</button>
+                    <button mat-menu-item>Item 3</button>
+                  </mat-menu>
+                  
+            </div>
+         
+
+           <mat-form-field appearance="fill" class="inputSearch" (input)="search($event)">
+
+            <mat-label>Search</mat-label>
+            <input matInput type="search" placeholder="ex:John" >
+        
+            </mat-form-field>
+
+
+        </div>
+        
+        <div class="Friends">
+            
+                <div  *ngFor="let i of users"  class="userProfInfo">
+                       
+                       <mat-card (click) ="chatUser(i)" style="width: 100%;" class="cardUser">
+                        <mat-card-content style="display: flex; gap: 1rem;">
+                            <img src="assets/Images/perfil.png" class="imgUser">
+                            <p class="userName">{{i.firstname + " " + i.lastname}}</p>
+                        </mat-card-content>
+                      </mat-card>
+                      
+                </div>
+              
+                  
+          
+        </div>
+
+    </div>
+
+    <div class="chats">
+
+         <div class="startingMessage" *ngIf="clicked == false"> Click on any chat in your left to start conversation! </div>
+
+        <div class="perfilFriend" *ngIf="clicked ">
+
+          
+            <mat-card style="width: 100%;" class="cardUser">
+                <mat-card-content style="display: flex; gap: 1rem;">
+                    <img src="assets/Images/perfil.png" class="imgUser">
+                    <p class="userName">{{selectedUser}}</p>
+                </mat-card-content>
+              </mat-card>
+              
+        </div> 
+
+        <div class="Messages">
+
+        </div>
+
+        <div class="textArea" *ngIf="clicked">
+            
+            <mat-form-field class="MessageTextArea">
+                
+                <mat-label>Type here! </mat-label>
+                <textarea matInput placeholder="Ex. Good Morning, here you're the document you were wondering about!"></textarea>
+              
+            </mat-form-field>
+            
+        </div>
+
+    </div>
+
+</div>

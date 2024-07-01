@@ -1,0 +1,54 @@
+<div class="MainTemplateReg">
+    <div class="LogoRegister">
+     
+    </div>
+  
+    <div class="RegisterRegForm">
+
+      <p>Sign Up</p>
+  
+      <form class="formRegister" [formGroup] = "userForm" (ngSubmit) = "submit()" #formDit = "ngForm" >
+
+        <mat-form-field appearance="fill" class="inputReg">
+          <mat-label>Last Name</mat-label>
+          <input matInput type="text" placeholder="ex: Djamblesse" formControlName = "lastName" required>
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill" class="inputReg">
+          <mat-label>First Name</mat-label>
+          <input matInput type="text" placeholder="ex: watara" formControlName = "firstName" required>
+        </mat-form-field>
+  
+        <mat-form-field class="inputReg">
+          <mat-label>Gender</mat-label>
+          <mat-select formControlName = "gender" required>
+            <mat-option value="Male">Male</mat-option>
+            <mat-option value="Female">Female</mat-option>
+          </mat-select>
+          
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill" class="inputReg">
+          <mat-label>Age</mat-label>
+          <input matInput type="number" placeholder="ex: 14" formControlName = "age" required>
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill" class="inputReg">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="ex: Djamblessewatas@gmail.com" formControlName = "email" required>
+        </mat-form-field>
+  
+        <mat-form-field appearance="fill" class="inputReg">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" placeholder="ex: novato#12?" formControlName = "password" required>
+        </mat-form-field>
+  
+        <div class="ButtonReg">
+          <button mat-raised-button class="inputReg buttonRegForm " routerLink ="/">Cancel</button>
+          <button mat-raised-button class="inputReg buttonRegForm" [disabled]="!userForm.valid" >Save</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+  

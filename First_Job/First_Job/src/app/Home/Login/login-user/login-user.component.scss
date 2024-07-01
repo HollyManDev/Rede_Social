@@ -1,0 +1,69 @@
+.loginMain{
+   
+    position: absolute;
+    left: 50%;
+    top: 57%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgb(209, 209, 209) ;
+    width: 60%;
+    height: 70%;
+    border-radius: 12px;
+    display: flex;
+}
+.loginLogo{
+    
+    width: 50%;
+    height: 100%;
+    background-color: dodgerblue;
+}
+.loginTemplate{
+
+    width: 50%;
+    height: 100%;
+   
+}
+.buttonLoginForm{
+
+    background-color: dodgerblue;
+     color: white; 
+     font-size: 20px;
+}
+.InputsLogin{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.inputLogin{
+
+width: 80%;
+margin: auto;
+
+}
+.buttonLoginForm{
+    width: 30%;
+}
+ button:hover{
+    width: 80%;
+    transition: 1s all ease-out;
+    background-color: white;
+    color: dodgerblue;
+
+
+}
+.FormLogin{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+.headerLogin{
+
+  width: 100%;
+  text-align: center;
+  font-size: 30px;
+  color: dodgerblue;
+  
+
+}
