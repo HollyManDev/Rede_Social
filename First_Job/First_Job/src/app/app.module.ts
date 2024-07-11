@@ -23,8 +23,7 @@ import { MatCardModule } from '@angular/material/card';
 
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { UserCrudComponent } from './Users/user-crud/user-crud.component';
-import { EditUserComponent } from './Users/edit-user/edit-user.component';
+
 
 @NgModule({
   declarations: [
@@ -34,8 +33,6 @@ import { EditUserComponent } from './Users/edit-user/edit-user.component';
     RegisterUserComponent,
     HomeNavbarComponent,
     MainUIOperationsComponent,
-    UserCrudComponent,
-    EditUserComponent
   ],
   
   imports: [

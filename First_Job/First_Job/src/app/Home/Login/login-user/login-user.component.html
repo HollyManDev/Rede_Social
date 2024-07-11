@@ -8,7 +8,7 @@
 
     <div class="loginTemplate">
 
-        <form class="FormLogin">
+        <form class="FormLogin" [formGroup] = "userForm" (ngSubmit) = "submit()" #formDit = "ngForm" >
               
             <p class="headerLogin"> Sign In</p>
 
@@ -17,18 +17,18 @@
                 <mat-form-field appearance="fill" class="inputLogin">
 
                     <mat-label>Email</mat-label>
-                    <input matInput type="email" placeholder="ex: Djambless@gmaill.com" >
+                    <input matInput type="email" placeholder="ex: Djambless@gmaill.com" formControlName = "email" required >
                  
                 </mat-form-field>
                   
                   <mat-form-field appearance="fill" class="inputLogin">
 
                     <mat-label>Senha</mat-label>
-                    <input matInput type="password" placeholder="ex: watara" >
+                    <input matInput type="password" placeholder="ex: watara" formControlName = "password" required >
                   
                   </mat-form-field>
                   
-                  <button mat-raised-button class= "inputLogin buttonLoginForm">Login</button>
+                  <button mat-raised-button class= "inputLogin buttonLoginForm"  type="submit">Login</button>
                   
                 
 
