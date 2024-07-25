@@ -9,6 +9,9 @@ import { ConversationModel } from './../../Models/Conversation';
 import { UsersConversationsParticipants } from './../../Models/usersConversationsParticipants';
 import { Document_or_Message } from 'src/app/Models/Document_or_Message';
 import { Participant } from 'src/app/Models/ConversationParticipant';
+import { MatDialog } from '@angular/material/dialog';
+import { NewGroupComponent } from '../CreateGroup/new-group/new-group.component';
+
 
 @Component({
   selector: 'app-main-uioperations',
@@ -17,11 +20,16 @@ import { Participant } from 'src/app/Models/ConversationParticipant';
 })
 export class MainUIOperationsComponent implements OnInit {
   userContent!: UserContent; 
+  userContent1!: UserContent; 
   users: User[] = [];
   allUsers: User[] = [];
-  allConversations!: UsersConversationsParticipants;
+  availableNewChat: User[] = [];
+  chatWith: User[] = [];
+  allConversations!: UsersConversationsParticipants ;
   selectedUser = '';
   loggedUserName = '';
+  fileName = '';
+  fileId = 0;
   exist = false; 
   clicked = false;
   userAuthenticated = 0;
@@ -29,9 +37,13 @@ export class MainUIOperationsComponent implements OnInit {
   participantId = 0;
   messageForm!: FormGroup;
   messDoc!: Document_or_Message; 
+  controlChats: boolean | string = false;
+  newChatId: number = 0;
 
-  constructor(private userService: UserServiceService) {}
+  constructor(private userService: UserServiceService, public dialog: MatDialog) {}
 
+  
+  
   ngOnInit(): void {
     this.messageForm = new FormGroup({
       userMessage: new FormControl('', Validators.required),
@@ -42,91 +54,119 @@ export class MainUIOperationsComponent implements OnInit {
     this.userAuthenticated = this.userService.GetUserAuthenticated();
 
     this.userService.GetUsers().subscribe(userData => {
+
       this.allUsers = userData.data;
-      this.users = userData.data;
+      this.users = this.allUsers.filter(user => user.id !== this.userAuthenticated);
+      this.allUsers = this.users;
+    
+
+    });
+    this. GetAllMyChats();
+  }
+
+  openModal(): void {
+
+    const dialogRef = this.dialog.open(NewGroupComponent, {
+      height:'50%',
+        width: '45%',
+        disableClose: true,
     });
 
-    this.userService.GetConversations(this.userAuthenticated).subscribe(userData => {
-      this.allConversations = userData.data;
-      console.log('Lista de conversas obtida:');
-      console.log(this.allConversations);
-      console.log('Informações dos participantes:', this.allConversations.allParticipants);
+    
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('O modal foi fechado. Resultado:', result);
+      // Aqui você pode realizar ações com base no resultado do modal
     });
   }
 
+  newChat(): void{
+     this.controlChats = true;
+  }
+
+  myChat(): void{
+   
+    this. GetAllMyChats();
+    this.controlChats = 'myChats';
+  }
+
   chatUser(user: User): void {
+
+    this.participantId = user.id;
     this.selectedUser = `${user.firstname} ${user.lastname}`;
     this.clicked = true;
-    this.participantId = user.id;
-  
-      for(let i of this.users){
-        // Recuperando o nome do usuario para criar a conversa
-         if(i.id == this.userAuthenticated){
-             this.loggedUserName = i.firstname;
-             break;
-         } 
+
+     // Encontrar o nome do usuário logado
+     for (let i of this.allUsers) {
+      if (i.id === this.userAuthenticated) {
+        this.loggedUserName = i.firstname;
+        break;
       }
-          // Verificando se a conversa ja existe ou nao
-        for (let c of this.allConversations.allConversations){
+    }
+     // Verificar se a conversa já 
+     
+     this.exist = this.checkConversationExists(user);
 
-             if((c.title === `${this.loggedUserName}${user.firstname}`) || 
-               (c.title === `${this.loggedUserName}${user.firstname}`))  {
-                   
-                  this.exist = true;
-                  break;
-                    
-               } 
-               else
-               this.exist = false;
-        }
-           
-        // Quando a conversa nao existe deve-se  criar uma conversa
-           if(this.exist != true){
-            
-            //Preenchendo o Objecto de  Conversas para Salvar
-            const userConversation: ConversationModel = {
-              id: 0,
-              title: `${this.loggedUserName}${user.firstname}`,
-              createdAt: '',
-              status: true
-            }
+     if (this.exist == false) {
 
-            const participant1: Participant = {
-             
-             userId: this.userAuthenticated,
-             conversationId: this.userContent.conversationId,
-             status: true
-            }
-            
-             const participant2: Participant = {
-             
-             userId: this.participantId,
-             conversationId: this.userContent.conversationId,
-             status: true
-            }
+       // Se a conversa não existe, criar uma nova
+       if(user){
+        this.createConversation(user);
+       }   
+     
+     } else {
+       console.log('Conversa já existe!');
+     }
 
-              //Criando uma conversa e adicionando Participants
-              this.SaveConversations(userConversation);
-              this.AddParticipants(participant1);
-              this.AddParticipants(participant2);
-              
-           }
-           else
-           console.log('Ja existe!');
-      
     this.getUserContent(this.userAuthenticated, this.participantId);
+  }
+  checkConversationExists(user: User): boolean {
+    this.exist = false; // Inicializa a variável exist
+  
+    // Verifica se há participantes carregados
+    if (this.allConversations && this.chatWith && this.chatWith.length > 0) {
+      // Verifica se a conversa já existe com base nos critérios definidos
+      for (let p of this.chatWith) {
+        if (p.id === this.userAuthenticated || p.id === this.participantId) {
+          for (let p1 of this.chatWith) {
+            if (`${this.loggedUserName}${user.firstname}` === `${p.firstname}${p1.firstname}` || 
+                `${this.loggedUserName}${user.firstname}` === `${p1.firstname}${p.firstname}`) {
+              this.exist = true;
+              break;
+            }
+          }
+          if (this.exist == true) {
+            break;
+          }
+        }
+      }
+    }
+    
+    return this.exist;
+  }
+  
+  createConversation(user: User): void {
+    // Criar objeto de conversa
+    const userConversation: ConversationModel = {
+      id: 0,
+      title: `${this.loggedUserName}${user.firstname}`,
+      createdAt: new Date().toISOString(),
+      status: true
+    };
+
+    // Salvar a conversa
+    if(userConversation){
+      this.SaveConversations(userConversation);
+    }
+   
   }
 
   getUserContent(userId: number, participantId: number): void {
     this.userService.getUserContent(userId, participantId).subscribe(
       (data) => {
         this.userContent = data.data;
-        console.log('Conteúdo do usuário obtido:', this.userContent);
-  
         // Criar um array combinado de mensagens e documentos
         let combinedContent: Array<{data: Document_or_Message}> = [];
 
-       
         // Adicionar todas as mensagens ao array combinado
         if (this.userContent && this.userContent.messages.length > 0) {
           this.userContent.messages.forEach(message => {
@@ -197,8 +237,13 @@ export class MainUIOperationsComponent implements OnInit {
         });
   
         console.log('Conteúdo combinado e organizado:', combinedContent);
-        this.userContent.content = combinedContent;
-        
+            if (this.userContent) {
+            this.userContent.content = combinedContent;
+            this.userContent1.content = combinedContent;
+          } else {
+            console.error('this.userContent is null or undefined. Unable to set content.');
+          }
+
         
       },
       error => {
@@ -209,6 +254,10 @@ export class MainUIOperationsComponent implements OnInit {
   
 
   search(event: Event): void {
+
+    this.controlChats = '';
+    this.controlChats = 'searching';
+
     const target = event.target as HTMLInputElement;
     const value = target.value.toLowerCase();
 
@@ -216,64 +265,80 @@ export class MainUIOperationsComponent implements OnInit {
       return (user.firstname.toLowerCase().includes(value)) || (user.lastname.toLowerCase().includes(value));
     });
   }
+   
+  
+  searchDoc(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value.toLowerCase();
 
-  onFileSelected(event: any): void {
+    this.userContent.content = this.userContent1.content.filter(doc => {
+      return (doc.data.content_or_FileName.toLowerCase().includes(value));
+    });
+  }
+
+  onFileSelected(event: any): void {   
     this.selectedFile = event.target.files[0];
   }
 
+ 
+  //Salvar Menssagem 
   onSubmit(): void {
     if (this.messageForm.invalid) {
       console.log('Formulário inválido. Verifique os campos.');
       return;
     }
-
+  
+    // Criar objeto de mensagem
     const messageData: Message = {
       id: 0,
       content: this.messageForm.get('userMessage')!.value,
       sentAt: new Date().toISOString(),
-      idConversation: this.messageForm.get('conversationId')!.value || this.userContent?.conversationId || 0,
+      idConversation: this.messageForm.get('conversationId')!.value || this.userContent?.conversationId || this.newChatId,
       status: true,
       userId: this.messageForm.get('userId')!.value || this.userAuthenticated || 0
     };
-
-    if (!this.selectedFile && !messageData.content) {
-      console.log('Preencha a mensagem ou selecione um arquivo para enviar.');
-      return;
-    }
-
+  
+    // Verificar se há um arquivo selecionado para upload
     if (this.selectedFile) {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
-      formData.append('conversationId', messageData.idConversation.toString());
-      formData.append('userId', messageData.userId.toString());
-
-      this.userService.UserMessage(messageData).subscribe(
-        (messageResponse) => {
-          console.log('Mensagem enviada com sucesso!', messageResponse);
-
-          this.userService.uploadDocument(formData).subscribe(
-            (documentResponse) => {
-              console.log('Documento enviado com sucesso!', documentResponse);
+      formData.append('conversationId', this.userContent?.conversationId.toString());
+      formData.append('userId', this.userAuthenticated.toString());
+  
+      // Enviar o documento
+      this.userService.uploadDocument(formData).subscribe(
+        (documentResponse) => {
+          console.log('Documento enviado com sucesso!', documentResponse);
+  
+          // Após enviar o documento, enviar também a mensagem
+          this.userService.UserMessage(messageData).subscribe(
+            (messageResponse) => {
+              console.log('Mensagem enviada com sucesso!', messageResponse);
               this.getUserContent(this.userAuthenticated, this.participantId);
               this.messageForm.reset();
-              this.selectedFile = null;
+              this.selectedFile = null; // Limpar o arquivo selecionado após o envio
+  
+             
             },
-            (documentError) => {
-              console.error('Erro ao enviar documento:', documentError);
-              alert('Erro ao enviar documento. Verifique o console para mais detalhes.');
+            (messageError) => {
+              console.error('Erro ao enviar mensagem:', messageError);
             }
           );
         },
-        (messageError) => {
-          console.error('Erro ao enviar mensagem:', messageError);
+        (documentError) => {
+          console.error('Erro ao enviar documento:', documentError);
+          alert('Erro ao enviar documento. Verifique o console para mais detalhes.');
         }
       );
     } else {
+      // Se não houver arquivo selecionado, enviar apenas a mensagem
       this.userService.UserMessage(messageData).subscribe(
         (messageResponse) => {
           console.log('Mensagem enviada com sucesso!', messageResponse);
           this.getUserContent(this.userAuthenticated, this.participantId);
           this.messageForm.reset();
+  
+        
         },
         (messageError) => {
           console.error('Erro ao enviar mensagem:', messageError);
@@ -281,12 +346,44 @@ export class MainUIOperationsComponent implements OnInit {
       );
     }
   }
-
+  
+  // Processo de salvar uma conversa
   SaveConversations(userConversation: ConversationModel): void {
     this.userService.CreateConversation(userConversation).subscribe(
       (response) => {
-        console.log('Conversa criada com sucesso');
-        console.log(response.data);
+        
+        //Pegando o id da novca conversa
+          this.newChatId = response.data
+
+        // Uma vez que em uma conversa  temos de ter no minimo duas pessoas envolvidas, segue abaixo os objectos:
+        const participant1: Participant = {
+             
+          userId: this.userAuthenticated,
+          conversationId: response.data,
+          status: true
+         }
+         
+          const participant2: Participant = {
+          
+          userId: this.participantId,
+          conversationId: response.data,
+          status: true
+         }
+
+         if(participant1.conversationId != 0 && participant1.userId  && participant2.conversationId != 0 && participant2.userId ){
+          this.AddParticipants(participant1);
+          this.AddParticipants(participant2);
+          
+          participant1.conversationId = 0;
+          participant1.userId = 0;
+          participant2.conversationId = 0;
+          participant2.userId = 0;
+          
+         }
+              //Buscando os amigos
+              
+         this. GetAllMyChats();
+
       },
       (error) => {
         console.error('Erro ao criar conversa:', error);
@@ -294,11 +391,12 @@ export class MainUIOperationsComponent implements OnInit {
     );
   }
 
+  // processso de adicionar participant em uma conversa
   AddParticipants(participant: Participant): void{
     
     this.userService.AddParticipants(participant).subscribe(
       (response) => {
-        console.log('Participante adicionado com sucesso');
+       
         console.log(response.data);
       },
       (error) => {
@@ -306,4 +404,54 @@ export class MainUIOperationsComponent implements OnInit {
       }
     );
   }
+  
+  getDoc(item: Document_or_Message): void{
+     
+    this.fileName = item.content_or_FileName;
+    this.fileId = item.id;  
+    // Chamando para doawload!
+    if(this.fileId){
+      this.downloadDocument(this.fileId);
+    }
+    
+  }
+  downloadDocument(documentId: number): void {
+    this.userService.downloadDocument(documentId).subscribe(
+      (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = this.fileName; // Nome do arquivo que será baixado
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      error => {
+        console.error('Error downloading document:', error);
+        
+      }
+    );
+  }
+
+    GetAllMyChats(): void{
+      this.userService.GetConversations(this.userAuthenticated).subscribe(
+        userData => {
+  
+          this.allConversations = userData.data;
+          //Filtrando users que não seja o que autenticou
+          this.chatWith = this.allConversations.allParticipants.filter(user => user.id !== this.userAuthenticated);
+  
+          // aqui é feito um filtro  para pegar os users que não tenho conversa com eles!
+          this.availableNewChat = this.users.filter(user =>
+            !this.chatWith.some(chatUser => chatUser.id === user.id)
+          );
+  
+        },
+        error => {
+          console.error('Erro ao obter conversas:', error);
+        }
+      );
+  
+    }
 }

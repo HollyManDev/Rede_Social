@@ -1,0 +1,41 @@
+<mat-dialog-content>
+    <div class="mainTemplate">
+
+        <form class="FormLogin" [formGroup] = "userForm" (ngSubmit) = "submit()" #formDit = "ngForm" style="display: flex; flex-direction: column; width: 100%; height: 100%; justify-content: space-evenly;" >
+                  
+            <p class="headerLogin"> Save Department </p>
+    
+            <div class="FormLogin">
+    
+                <mat-form-field appearance="fill" class="inputLogin">
+    
+                    <mat-label>Department</mat-label>
+                    <input matInput type="text" placeholder="ex: Human Resources" formControlName = "department" required >
+                 
+                </mat-form-field>
+                
+                <div class="btnForm">
+                    <button mat-raised-button class= "buttonLoginForm cancel" (click)="Close()" type="button">
+                        <img src="assets/Images/cancelDept.png" alt="" class="imgStyle">
+                        <span>Cancel</span>
+                    </button>
+                      
+                    <button mat-raised-button class= "buttonLoginForm login"  type="submit">
+                        <ng-container *ngIf="typeButton === 'Add'">
+                            <img src="assets/Images/save.png" alt="" class="imgStyle">
+                          </ng-container>
+                          <ng-container *ngIf="typeButton === 'Save'">
+                            <img src="assets/Images/editDept.png" alt="" class="imgStyle">
+                          </ng-container>
+                          <span>{{ typeButton }}</span>
+                    </button>
+
+                </div>
+                  
+            </div>    
+        </form>
+    
+    </div>
+</mat-dialog-content>
+
+

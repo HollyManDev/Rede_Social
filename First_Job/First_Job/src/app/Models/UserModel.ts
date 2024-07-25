@@ -5,8 +5,10 @@ export interface User{
     firstname: string
     gender: string;
     age: number;
+    departmentId: number;
     email: string;
     password: string;
     status: boolean;
+    acess: string;
     
 }

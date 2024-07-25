@@ -1,0 +1,51 @@
+<div class="MainTemplate">
+
+    <button mat-raised-button color=""  (click)="addDep()" class="btnAdd">
+      <img src="assets/Images/add.png" alt="" class="imgStyle">
+      <span > Add </span>
+    </button>
+  
+    <table  mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+<!-- Id Column -->
+<ng-container matColumnDef="Id">
+  <th mat-header-cell *matHeaderCellDef> Id </th>
+  <td mat-cell *matCellDef="let department"> {{ department.id }} </td>
+</ng-container>
+
+<!-- Department Column -->
+<ng-container matColumnDef="Department">
+  <th mat-header-cell *matHeaderCellDef> Department </th>
+  <td mat-cell *matCellDef="let departments"> {{ departments.department}} </td>
+</ng-container>
+
+<!-- Status Column -->
+<ng-container matColumnDef="Status">
+  <th mat-header-cell *matHeaderCellDef> Status </th>
+  <td mat-cell *matCellDef="let departments"> {{ departments.status ? 'Active' : 'Inactive' }} </td>
+</ng-container>
+
+      <!-- Edit Column -->
+      <ng-container matColumnDef="Edit">
+        <th mat-header-cell *matHeaderCellDef> Edit </th>
+        <td mat-cell *matCellDef="let departments">
+          <button mat-icon-button color="primary" (click)="editDepartment(departments)">
+            <mat-icon><img src="assets/Images/edit.png" alt=""></mat-icon>
+          </button>
+        </td>
+      </ng-container>
+    
+      <!-- Remove Column -->
+      <ng-container matColumnDef="Remove">
+        <th mat-header-cell *matHeaderCellDef> Remove </th>
+        <td mat-cell *matCellDef="let departments">
+          <button mat-icon-button color="warn" (click)="removeDepartment(departments)">
+            <mat-icon> <mat-icon><img src="assets/Images/delete.png" alt=""></mat-icon></mat-icon>
+          </button>
+        </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" style="color: white;"></tr>
+      <tr mat-row *matRowDef="let departments; columns: displayedColumns;"></tr>
+    </table>
+    
+  </div>

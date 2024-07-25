@@ -5,7 +5,7 @@
   
     <div class="RegisterRegForm">
 
-      <p>Sign Up</p>
+    <p>Sign Up</p>
   
       <form class="formRegister" [formGroup] = "userForm" (ngSubmit) = "submit()" #formDit = "ngForm" >
 
@@ -32,7 +32,17 @@
           <mat-label>Age</mat-label>
           <input matInput type="number" placeholder="ex: 14" formControlName = "age" required>
         </mat-form-field>
-  
+
+        <mat-form-field class="inputReg">
+          <mat-label>Departments</mat-label>
+          <mat-select formControlName="department" required>
+            <mat-option *ngFor="let department of departments" [value]="department.department" (click) = "getDepartmentName(department)">
+              {{ department.department }}
+      
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        
         <mat-form-field appearance="fill" class="inputReg">
           <mat-label>Email</mat-label>
           <input matInput type="email" placeholder="ex: Djamblessewatas@gmail.com" formControlName = "email" required>
@@ -44,8 +54,24 @@
         </mat-form-field>
   
         <div class="ButtonReg">
-          <button mat-raised-button class="inputReg buttonRegForm " routerLink ="/">Cancel</button>
-          <button mat-raised-button class="inputReg buttonRegForm" [disabled]="!userForm.valid" type="submit">Save</button>
+          <button mat-raised-button class="inputReg buttonRegForm " routerLink ="/HomeMain/AllUsers">
+           
+            <img src="assets/Images/cancelDept.png" alt="" class="imgStyle">
+            <span>Cancel</span>
+
+          </button>
+
+          <button mat-raised-button class="inputReg buttonRegForm" type="submit">
+
+            <ng-container *ngIf="typeButton === 'Add'">
+              <img src="assets/Images/save.png" alt="" class="imgStyle">
+            </ng-container>
+            <ng-container *ngIf="typeButton === 'Save'">
+              <img src="assets/Images/editPerson.png" alt="" class="imgStyle">
+            </ng-container>
+            <span>{{ typeButton }}</span>
+               
+          </button>
         </div>
 
       </form>

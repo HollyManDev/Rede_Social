@@ -1,8 +1,9 @@
 import { ConversationModel } from "./Conversation";
-import { Participant } from "./ConversationParticipant";
+import { teste } from "./teste";
+import { User } from "./UserModel";
 
-export interface UsersConversationsParticipants{
-    
-    allConversations: ConversationModel[];
-    allParticipants: Participant[];
+export interface UsersConversationsParticipants {
+ 
+    allConversations1: ConversationModel []; // Corrigido para allConversations
+    allParticipants: User[];
 }

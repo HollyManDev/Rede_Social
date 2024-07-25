@@ -1,0 +1,43 @@
+.MainTemplate{
+     
+    height: 100%;
+    margin: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    
+}
+.btnAdd{
+   
+      width: 1rem;
+      display: flex;
+      justify-content: flex-end;
+        
+}
+button:hover{
+
+    background-color: rgb(0,26,49);
+    color: white;
+    transition: 1s all  ease-in-out;
+    text-align: center;
+    
+    .imgStyle{
+        display: none;
+        
+    }
+    span{
+        display: flex;
+    }
+}
+table th{
+   background-color: rgb(0,26,49);
+}
+.imgStyle{
+  
+    width: 30px;
+    height: 30px;
+}
+span{
+    width: 100%;
+    display: none;
+}

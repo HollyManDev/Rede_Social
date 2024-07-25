@@ -23,8 +23,8 @@ export class LoginUserComponent implements OnInit {
     });
 
     this.userForm.patchValue({
-      email: 'djamb@gmail.com',
-      password: 'djamb12'
+      email: 'holy@gmail.com',
+      password: 'holy12'
     })
   }
   submit() {
@@ -42,8 +42,14 @@ export class LoginUserComponent implements OnInit {
             
             this.userService.SetUserAuthenticated(response.data.id);
             this.showSuccessMessage();
-            this.router.navigate(['/MainUI'])
 
+            if(response.data.acess === 'staff'){
+              this.router.navigate(['/MainUI'])
+            }
+            else{
+              this.router.navigate(['/HomeMain'])
+            }
+         
           } else {
 
             this.showErrorMessage('Invalid Credentials');
