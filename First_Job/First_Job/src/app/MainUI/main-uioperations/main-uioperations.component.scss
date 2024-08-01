@@ -45,13 +45,8 @@
     border: none;
     cursor:pointer;
     font-size: 14px;
+    margin-top:  0.5rem;
 
-}
-
-.btnChats:hover{
-
-    transition: 1s all ease-out;
-    color: dodgerblue;
 }
 
 .Friends{
@@ -109,12 +104,12 @@
 
 .Messages{
     width: 100%;
-    height: 100%;
+    height: 85%;
     margin-top: 1rem;
     margin-bottom: 1rem;
     position: relative;
     overflow-y: scroll;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     display: flex;
     justify-content: flex-end;
 }
@@ -122,15 +117,14 @@
 .textArea{
 
   width: 100%;
-  height: 17%;
+  height: 6.5rem;
   display: flex;
+ 
 
 }
 
 .MessageTextArea{
-    width: 40rem;
-    height: 5rem;
-  
+  margin-bottom:0.5rem;
     
 }
 
@@ -162,9 +156,16 @@
 
     width: 30px; 
     height: 30px; 
-    border-radius: 5rem;
+    
 
 }
+.imgStyle{
+  
+    width: 30px;
+    height: 30px;
+    
+}
+
 .userName{
     padding-top: 0.5rem; 
     font-size: 18px;
@@ -183,4 +184,26 @@
     position: absolute;
     background-color: white;
     border: 1px solid lightgray;
+}
+mat-card-content{
+    cursor: pointer;
+}
+/* Inicialmente, ocultar os botões */
+.btnOptionMessage,
+.btnOptionDoc {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: none;
+}
+
+/* Mostrar o botão de opções quando o mouse está sobre o mat-card */
+mat-card:hover .btnOptionMessage,
+mat-card:hover .btnOptionDoc {
+    display: block;
+}
+
+/* Adicionalmente, esconder o botão de download quando o mouse está sobre o mat-card */
+.OtherUserDoc:hover .doawload {
+    display: none;
 }

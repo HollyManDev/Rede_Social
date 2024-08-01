@@ -11,8 +11,26 @@
             <div class="OtherOptions">
              
               <div class="paragrafo"> 
-                <button  (click)="myChat()" class="btnChats" style="margin-left: 0.3rem;"> My chats</button>
-                <button (click)="newChat()" class="btnChats" style="margin-left: 0.5rem;"> New chat</button>
+
+                <button  (click)="myChat()" class="btnChats" style="margin-left: 0.3rem;"> 
+                  <img src="assets/Images/myChats.png" alt="" class="imgStyle">
+                    
+
+                </button>
+
+                <button (click)="newChat()" class="btnChats"> 
+
+                  <img src="assets/Images/newChat.png" alt="" class="imgStyle">
+                
+                </button>
+
+                <button (click)="group()" class="btnChats"> 
+
+                  <img src="assets/Images/group1.png" alt="" class="imgStyle">
+                
+                </button>
+
+
              </div>
                   
                 <button mat-icon-button [matMenuTriggerFor]="menu">
@@ -21,8 +39,8 @@
                   
                   <mat-menu #menu="matMenu">
                     <button mat-menu-item (click)="openModal()">New Group</button>
-                    <button mat-menu-item>New Conversation</button>
                     <button mat-menu-item>Settings</button>
+                    <button mat-menu-item routerLink="" >Logout</button>
                   </mat-menu>
                   
             </div>
@@ -53,8 +71,8 @@
         
           <!-- Exibe users quando controlChats for true -->
           <div *ngIf="controlChats == true" style="width: 100%; height: 100%;">
-            <div *ngFor="let i of availableNewChat" class="userProfInfo">
-              <mat-card (click)="chatUser(i)" style="width: 100%;" class="cardUser" *ngIf="i.status == true && i.id != userAuthenticated">
+            <div *ngFor="let i of allUsers" class="userProfInfo">
+              <mat-card (click)="chatUser(i)" style="width: 100%;" class="cardUser">
                 <mat-card-content style="display: flex; gap: 1rem;">
                   <img src="assets/Images/perfil.png" class="imgUser">
                   <p class="userName">{{ i.firstname + " " + i.lastname }}</p>
@@ -78,7 +96,7 @@
           <!-- Exibe o usuario que esta sendo buscado! -->
           <div *ngIf="controlChats === 'searching'" style="width: 100%; height: 100%;">
             <div *ngFor="let i of users" class="userProfInfo">
-              <mat-card (click)="chatUser(i)" style="width: 100%;" class="cardUser" *ngIf="i.status == true && i.id != userAuthenticated">
+              <mat-card (click)="chatUser(i)" style="width: 100%;" class="cardUser">
                 <mat-card-content style="display: flex; gap: 1rem;">
                   <img src="assets/Images/perfil.png" class="imgUser">
                   <p class="userName">{{ i.firstname + " " + i.lastname }}</p>
@@ -86,8 +104,21 @@
               </mat-card>
             </div>
           </div>
-        </div>
-        
+
+          <div *ngIf="controlChats == 'group'"  style="width: 100%; height: 100%;">
+            <div *ngFor="let i of conversationShow" class="userProfInfo">
+              <ng-container style="width: 100%; height: 100%;" *ngIf="i.type == 'group' ">
+                <mat-card  (click)="getGroup(i)" style="width: 100%;" class="cardUser">
+                  <mat-card-content style="display: flex; gap: 1rem;">
+                    <img src="assets/Images/group.png" class="imgUser">
+                    <p class="userName">{{ i.title}}</p>
+                  </mat-card-content>
+                </mat-card>
+              </ng-container>
+           
+            </div>
+          </div>
+        </div>     
        
     </div>
 
@@ -107,85 +138,282 @@
                     <img src="assets/Images/perfil.png" class="imgUser">
                     <p class="userName">{{selectedUser}}</p>
                   </div> 
-                 
-                    <button class="btnSearch" style=" justify-content: flex-end; border: none; background-color: white;">
-                      <img src="assets/Images/search.png" class="imgUser">
-                    </button>
+      
                 </mat-card-content>
               </mat-card>
               
         </div>  
 
-        
         <div class="Messages">
-         <!-- <div class="SearchDoc"> </div> -->
-          <div *ngIf="clicked == true && userContent" style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
-           
-            <div *ngFor="let item of userContent.content">
-              <ng-container *ngIf="item.data.type === 'message' && item.data.userId === userAuthenticated ">
-                <!-- Exibir mensagem -->
-                <mat-card   style=" margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem; background-color: rgba(172, 243, 172, 0.726);">
-                  <mat-card-content>
-                    <p style="font-size: 16px;">{{ item.data.content_or_FileName}}</p>
-                    <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">{{ item.data.sentAt_or_UploadedAt| date:'HH:mm'}}</small>
-                  </mat-card-content>
-                </mat-card>
-              </ng-container>
-
-              <ng-container *ngIf="item.data.type === 'message' && item.data.userId !== userAuthenticated ">
-                <!-- Exibir mensagem -->
-                <mat-card   style="margin-bottom: 0.5rem; margin-left: 4rem; border-radius: 10px; margin-right: 4rem; background-color: lightgray;">
-                  <mat-card-content>
-                    <p style="font-size: 16px;">{{ item.data.content_or_FileName}}</p>
-                   <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">{{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}</small>
-
-                  </mat-card-content>
-                </mat-card>
-              </ng-container>
-           
-
-              <ng-container *ngIf="item.data.type === 'document' && item.data.userId === userAuthenticated">  
-                <!-- Exibir documento -->
-                <mat-card  (click) ="getDoc(item.data)" [style.background-color]="'rgba(172, 243, 172, 0.726)'"   style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem; background-color: rgba(172, 243, 172, 0.726);">
-                  <mat-card-content>
-                    <p style="font-size: 16px; ">{{ item.data.content_or_FileName}}</p>
-                    <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">{{item.data.sentAt_or_UploadedAt | date:'HH:mm'}}</small>
-                  </mat-card-content>
-                </mat-card>
-              </ng-container>
-              <ng-container *ngIf="item.data.type === 'document' && item.data.userId !== userAuthenticated">  
-                <!-- Exibir documento -->
-                <mat-card  (click) ="getDoc(item.data)" [style.background-color]="'lightgray'" style="margin-bottom: 0.5rem; border-radius: 10px; margin-left: 4rem; margin-right: 4rem; background-color: lightgray;">
-                  <mat-card-content>
-                    <p style="font-size: 16px; ">{{ item.data.content_or_FileName}}</p>
-                    <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">{{item.data.sentAt_or_UploadedAt | date:'HH:mm'}}</small>
-                  </mat-card-content>
-                </mat-card>
-              </ng-container>
-            </div>
-          </div>
-        </div>   
+          <div *ngIf="clicked === true && (userContent?.content || userContent1?.content)"
+               style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
         
+            <!-- Verificação de mensagens normais -->
+            <div *ngIf="messageVerify === 'normal'"
+                 style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
+              <div *ngFor="let item of (userContent?.content || [])">
+        
+                <!-- Mensagem do usuário autenticado -->
+                <ng-container *ngIf="item.data.type === 'message' && item.data.userId === userAuthenticated">
+                  <mat-card
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem; background-color: rgba(172, 243, 172, 0.726);">
+                    <mat-card-content>
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        {{ item.data.content_or_FileName }}
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionMessage">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item (click)="openModalEdit(item.data)">Edit Message</button>
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === false" src="assets/Images/afterSending.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                             <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+        
+                <!-- Mensagem de outro usuário -->
+                <ng-container *ngIf="item.data.type === 'message' && item.data.userId !== userAuthenticated">
+                  <mat-card
+                    style="margin-bottom: 0.5rem; margin-left: 4rem; border-radius: 10px; margin-right: 4rem; background-color: lightgray;">
+                    <mat-card-content>
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        {{ item.data.content_or_FileName }}
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionMessage">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                        style="width: 20px; height: 20px; margin-left: 2px;">
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+        
+                <!-- Documento do usuário autenticado -->
+                <ng-container *ngIf="item.data.type === 'document' && item.data.userId === userAuthenticated">
+                  <mat-card
+                    [style.background-color]="'rgba(172, 243, 172, 0.726)'"
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem;">
+                    <mat-card-content>
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;"
+                           class="OtherUserDoc">
+                        {{ item.data.content_or_FileName }}
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionDoc">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                        <img *ngIf="item.data.doawloaded === false" src="assets/Images/afterSending.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+        
+                <!-- Documento de outro usuário -->
+                <ng-container *ngIf="item.data.type === 'document' && item.data.userId !== userAuthenticated">
+                  <mat-card
+                    [style.background-color]="'lightgray'"
+                    style="margin-bottom: 0.5rem; border-radius: 10px; margin-left: 4rem; margin-right: 4rem;">
+                    <mat-card-content (mouseenter)="onMouseEnter(item.data)" (mouseleave)="onMouseLeave()">
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        {{ item.data.content_or_FileName }}
+                        <img *ngIf="item.data.doawloaded === false" src="assets/Images/dowload.png" alt="Options"
+                             class="imgStyle doawload" (click)="getDoc(item.data)">
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionDoc">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+              </div>
+            </div>
+        
+            <!-- Verificação de mensagens em grupo -->
+            <div *ngIf="messageVerify === 'group'"
+                 style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
+              <div *ngFor="let item of (userContent1?.content || [])">
+        
+                <!-- Mensagem do usuário autenticado -->
+                <ng-container *ngIf="item.data.type === 'message' && item.data.userId === userAuthenticated">
+                  <mat-card
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem; background-color: rgba(172, 243, 172, 0.726);">
+                    <mat-card-content>
+                      <div style="font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
+                        {{ item.data.content_or_FileName }}
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionMessage">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item (click)="openModalEdit(item.data)">Edit Message</button>
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+        
+                <!-- Mensagem de outro usuário -->
+                <ng-container *ngIf="item.data.type === 'message' && item.data.userId !== userAuthenticated">
+                  <mat-card
+                    style="margin-bottom: 0.5rem; margin-left: 4rem; border-radius: 10px; margin-right: 4rem; background-color: lightgray;">
+                    <mat-card-content>
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        {{ item.data.content_or_FileName }}
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionMessage">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+        
+                <!-- Documento do usuário autenticado -->
+                <ng-container *ngIf="item.data.type === 'document' && item.data.userId === userAuthenticated">
+                  <mat-card
+                    [style.background-color]="'rgba(172, 243, 172, 0.726)'"
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem;">
+                    <mat-card-content>
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;"
+                           class="OtherUserDoc">
+                        {{ item.data.content_or_FileName }}
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionDoc">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                        <img *ngIf="item.data.doawloaded === false" src="assets/Images/afterSending.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+        
+                <!-- Documento de outro usuário -->
+                <ng-container *ngIf="item.data.type === 'document' && item.data.userId !== userAuthenticated">
+                  <mat-card
+                    [style.background-color]="'lightgray'"
+                    style="margin-bottom: 0.5rem; border-radius: 10px; margin-left: 4rem; margin-right: 4rem;">
+                    <mat-card-content (mouseenter)="onMouseEnter(item.data)" (mouseleave)="onMouseLeave()">
+                      <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
+                        {{ item.data.content_or_FileName }}
+                        <img *ngIf="item.data.doawloaded === false" src="assets/Images/dowload.png" alt="Options"
+                             class="imgStyle doawload" (click)="getDoc(item.data)">
+                        <button mat-icon-button [matMenuTriggerFor]="menu" class="btnOptionDoc">
+                          <mat-icon>
+                            <img src="assets/Images/optionsMessage.png" alt="Options" style="width: 24px; height: 24px;">
+                          </mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item routerLink="">Forward</button>
+                        </mat-menu>
+                      </div>
+                      <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
+                        {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
+                      </small>
+                    </mat-card-content>
+                  </mat-card>
+                </ng-container>
+              </div>
+            </div>
+        
+          </div>
+        </div>
+               
         <div class="textArea" *ngIf="clicked">
 
-            <form [formGroup]="messageForm" (ngSubmit)="onSubmit()" #documentForm="ngForm" style="width: 100%; margin-left: 0.5rem; margin-right: 0.5rem; display: flex; flex-direction: column; gap: 0.2rem;">
+            <form (keydown.enter)="onEnter($event)" [formGroup]="messageForm" (ngSubmit)="onSubmit()" #documentForm="ngForm" style="width: 100%; margin-left: 0.5rem; margin-right: 0.5rem; display: flex; gap: 0.5rem;">
             
-              <div>
-                <input type="file" name="file" (change)="onFileSelected($event)" required style="">
+              <div style="position: relative;">
+                <input type="file" name="file" (change)="onFileSelected($event)" required style="opacity: 0; position: absolute; margin-top: 2.5rem;">  
+                <img src="assets/Images/upload.png" alt="" class="imgStyle" style="margin-top: 2.5rem;">
                 <input type="hidden" name="conversationId" formControlName="conversationId" value="">
                 <input type="hidden" name="userId" formControlName="userId" value="1">
               </div>
               
-              <div style=" width: 100%; display: flex;  justify-content: space-between; ">
-              
-                <mat-form-field style="width: 95%; height: 5rem;">
+              <div style=" width: 100%; display: flex; ">
+                   
+               <div style="width: 95%;  display: flex; flex-direction: column;">
+
+                <p style="margin-left: 0.5rem; opacity: 0; margin-bottom: 0.5rem; " id="fileName"  >{{fileName1}}</p>
+
+                <mat-form-field style="width: 100%; height: 6rem;">
                   <mat-label>Type here!</mat-label>
-                  <textarea matInput placeholder="Ex. Good Morning, here's the document you were wondering about!" formControlName="userMessage"></textarea>  
+                  <textarea matInput placeholder="Ex. Good Morning, here's the document you were wondering about!" formControlName="userMessage" ></textarea>  
                 </mat-form-field>
 
-                <div style="margin-top: 1rem; margin-right: 1.3rem;">
-                  <button type="submit" style="border: none; background-color: white;"> 
-                    <img src="assets/Images/sendIcon.png" alt="Send">
+               </div> 
+
+                <div style="margin-top: 2.5rem; margin-right: 1.3rem;">
+                  <button type="submit" style="border: none; background-color: white; margin-left: 0.5rem;"> 
+                    <img src="assets/Images/Send.png" alt="Send" class="imgStyle">
                   </button>
                 </div>
 

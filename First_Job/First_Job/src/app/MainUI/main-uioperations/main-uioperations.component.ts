@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserServiceService } from './../../Service/user-service.service';
 import { User } from 'src/app/Models/UserModel';
 import { UserContent } from './../../Models/UserContentModel';
-import { Documents } from './../../Models/Document'; 
+import { ChangeDetectorRef } from '@angular/core';
 import { Message } from 'src/app/Models/MessageModel';
 import { ConversationModel } from './../../Models/Conversation';
 import { UsersConversationsParticipants } from './../../Models/usersConversationsParticipants';
@@ -11,6 +11,8 @@ import { Document_or_Message } from 'src/app/Models/Document_or_Message';
 import { Participant } from 'src/app/Models/ConversationParticipant';
 import { MatDialog } from '@angular/material/dialog';
 import { NewGroupComponent } from '../CreateGroup/new-group/new-group.component';
+import Groups from 'src/app/Models/Group';
+import { EditionComponent } from '../EditMessage/edition/edition.component';
 
 
 @Component({
@@ -19,18 +21,23 @@ import { NewGroupComponent } from '../CreateGroup/new-group/new-group.component'
   styleUrls: ['./main-uioperations.component.scss']
 })
 export class MainUIOperationsComponent implements OnInit {
-  userContent!: UserContent; 
-  userContent1!: UserContent; 
+ 
   users: User[] = [];
   allUsers: User[] = [];
+  allUsers1: User[] = [];
   availableNewChat: User[] = [];
+  conversationShow: ConversationModel [] = [];
   chatWith: User[] = [];
   allConversations!: UsersConversationsParticipants ;
   selectedUser = '';
+  newConvFriend = '';
+  messageVerify = '';
   loggedUserName = '';
+  status: boolean = false;
   fileName = '';
+  fileName1 = 'documnetTeste.teste';
   fileId = 0;
-  exist = false; 
+  exist: any ; 
   clicked = false;
   userAuthenticated = 0;
   selectedFile: File | null = null;
@@ -39,11 +46,29 @@ export class MainUIOperationsComponent implements OnInit {
   messDoc!: Document_or_Message; 
   controlChats: boolean | string = false;
   newChatId: number = 0;
-
-  constructor(private userService: UserServiceService, public dialog: MatDialog) {}
-
   
+  userContent: UserContent = {
+    userId: 0, 
+    conversationId: 0, 
+    messages: [],
+    documents: [],
+    content: []
+  };
   
+  userContent1: Groups = {
+  
+    userId: 0, 
+    conversationId: 0, 
+    messages: [],
+    documents: [],
+    content: []
+  };
+   
+
+  constructor(private userService: UserServiceService, public dialog: MatDialog, private changeDetectorRef: ChangeDetectorRef
+  )
+   {}
+
   ngOnInit(): void {
     this.messageForm = new FormGroup({
       userMessage: new FormControl('', Validators.required),
@@ -55,48 +80,107 @@ export class MainUIOperationsComponent implements OnInit {
 
     this.userService.GetUsers().subscribe(userData => {
 
-      this.allUsers = userData.data;
-      this.users = this.allUsers.filter(user => user.id !== this.userAuthenticated);
-      this.allUsers = this.users;
+        if(userData.data){
+          this.allUsers = userData.data;
+          this.allUsers1 = userData.data;
+          this.users = this.allUsers.filter(user => user.id !== this.userAuthenticated);
+          this.allUsers = this.users;
+        }
+    
     
 
     });
     this. GetAllMyChats();
+
   }
 
+  onMouseEnter(i : Document_or_Message ): void{
+
+    let docs = document.getElementById('docOther');
+
+    if(docs && i.doawloaded === true){
+         docs.style.display = 'flex'
+    }
+     
+  }
+  onMouseLeave(){
+    let docs = document.getElementById('docOther');
+
+    if(docs){
+         docs.style.display = 'none'
+    }
+  }
   openModal(): void {
 
     const dialogRef = this.dialog.open(NewGroupComponent, {
-      height:'50%',
-        width: '45%',
+      height:'80%',
+        width: '50%',
         disableClose: true,
     });
-
     
     dialogRef.afterClosed().subscribe(result => {
       console.log('O modal foi fechado. Resultado:', result);
       // Aqui você pode realizar ações com base no resultado do modal
+      this. GetAllMyChats();
+    });
+
+  }
+  
+  openModalEdit(message: Document_or_Message): void {
+
+    const dialogRef = this.dialog.open(EditionComponent, {
+      height: '40%',
+      width: '30%',
+      disableClose: true,
+    });
+
+    //Guardando a Menssagem
+    this.userService.SetMessageEdition(message);
+
+    dialogRef.afterClosed().subscribe(result => {
+      
+      //Recuperando logo que fechar a janela
+    this.messDoc = this.userService.GetMessageEdition();
+   
+    //Removendo uma para ter outra
+     this.userContent.content = this.userContent.content.filter(m => m.data.id !== this.messDoc.id );
+      
+     //actualizando
+     this.userContent.content.push({data: this.messDoc});
+
     });
   }
 
   newChat(): void{
      this.controlChats = true;
+     this.GetAllMyChats();
   }
+  
+  group(): void{
+    this.controlChats = 'group';
+ }
 
-  myChat(): void{
-   
-    this. GetAllMyChats();
+  myChat(): void{ 
     this.controlChats = 'myChats';
   }
 
-  chatUser(user: User): void {
+  getGroup(c: ConversationModel): void{
+    this.messageVerify = 'group'
+    this.clicked = true;
+    this.selectedUser = c.title
+    this.getGroupContent(c.id);
+  }
 
+  chatUser(user: User): void {
+    
+    this.messageVerify = 'normal'
     this.participantId = user.id;
     this.selectedUser = `${user.firstname} ${user.lastname}`;
+    this.newConvFriend = user.firstname
     this.clicked = true;
 
      // Encontrar o nome do usuário logado
-     for (let i of this.allUsers) {
+     for (let i of this.allUsers1) {
       if (i.id === this.userAuthenticated) {
         this.loggedUserName = i.firstname;
         break;
@@ -104,57 +188,45 @@ export class MainUIOperationsComponent implements OnInit {
     }
      // Verificar se a conversa já 
      
-     this.exist = this.checkConversationExists(user);
+     this.exist = this.checkConversationExists( this.newConvFriend );
 
-     if (this.exist == false) {
+     if (this.exist === null || this.exist === undefined) {
 
        // Se a conversa não existe, criar uma nova
-       if(user){
-        this.createConversation(user);
-       }   
+        this.createConversation( this.newConvFriend);   
      
      } else {
        console.log('Conversa já existe!');
      }
 
+
     this.getUserContent(this.userAuthenticated, this.participantId);
   }
-  checkConversationExists(user: User): boolean {
-    this.exist = false; // Inicializa a variável exist
+
+  checkConversationExists(user: string): boolean {
   
     // Verifica se há participantes carregados
-    if (this.allConversations && this.chatWith && this.chatWith.length > 0) {
+    if (this.allConversations.allConversation.length > 0) {
       // Verifica se a conversa já existe com base nos critérios definidos
-      for (let p of this.chatWith) {
-        if (p.id === this.userAuthenticated || p.id === this.participantId) {
-          for (let p1 of this.chatWith) {
-            if (`${this.loggedUserName}${user.firstname}` === `${p.firstname}${p1.firstname}` || 
-                `${this.loggedUserName}${user.firstname}` === `${p1.firstname}${p.firstname}`) {
-              this.exist = true;
-              break;
-            }
-          }
-          if (this.exist == true) {
-            break;
-          }
-        }
-      }
+          this.exist = this.allConversations.allConversation.find(c => c.title === `${this.loggedUserName}${user}` );   
     }
     
     return this.exist;
   }
   
-  createConversation(user: User): void {
+  createConversation(user: string): void {
     // Criar objeto de conversa
     const userConversation: ConversationModel = {
       id: 0,
-      title: `${this.loggedUserName}${user.firstname}`,
+      title: `${this.loggedUserName}${user}`,
       createdAt: new Date().toISOString(),
-      status: true
+      status: true,
+      type: 'normal'
     };
-
+       
     // Salvar a conversa
     if(userConversation){
+      
       this.SaveConversations(userConversation);
     }
    
@@ -163,95 +235,155 @@ export class MainUIOperationsComponent implements OnInit {
   getUserContent(userId: number, participantId: number): void {
     this.userService.getUserContent(userId, participantId).subscribe(
       (data) => {
-        this.userContent = data.data;
-        // Criar um array combinado de mensagens e documentos
-        let combinedContent: Array<{data: Document_or_Message}> = [];
-
-        // Adicionar todas as mensagens ao array combinado
-        if (this.userContent && this.userContent.messages.length > 0) {
-          this.userContent.messages.forEach(message => {
-
-             this.messDoc = {
-                
-              id: message.id,
-              content_or_FileName: message.content,
-              sentAt_or_UploadedAt: message.sentAt,
-              idConversation: message.idConversation,
-              status: message.status,
-              userId: message.userId,
-              type: 'message'
-              
-
-            };
-    
-            combinedContent.push({data: this.messDoc});
-
-          });
-        }
-  
-        // Adicionar todos os documentos ao array combinado
-        if (this.userContent && this.userContent.documents.length > 0) {
-          this.userContent.documents.forEach(document => {
-
-            
-            this.messDoc = {
-                
-              id: document.id,
-              content_or_FileName: document.fileName,
-              sentAt_or_UploadedAt: document.uploadedAt,
-              idConversation: document.idConversation,
-              status: document.status,
-              userId: document.userId,
-              type: 'document'
-              
-
-            };
-            
-            combinedContent.push({data: this.messDoc});
-          });
-        }
-  
-        // Ordenar o array combinado por data de envio ou upload
-        combinedContent.sort((a, b) => {
-          let dateA: string | undefined;
-          let dateB: string | undefined;  
-  
-          if (a.data.type === 'message') {
-            dateA = a.data.sentAt_or_UploadedAt;
-          } else if (a.data.type === 'document') {
-            dateA = a.data.sentAt_or_UploadedAt;
-          }
-  
-          if (b.data.type === 'message') {
-            dateB = b.data.sentAt_or_UploadedAt;
-          } else if (b.data.type === 'document') {
-            dateB = b.data.sentAt_or_UploadedAt;
-          }
-  
-          // Converter as datas para objetos Date e comparar
-          if (dateA && dateB) {
-            return new Date(dateA).getTime() - new Date(dateB).getTime();
-          } else {
-            return 0; // Em caso de datas indefinidas, considerar como igual
-          }
-        });
-  
-        console.log('Conteúdo combinado e organizado:', combinedContent);
-            if (this.userContent) {
-            this.userContent.content = combinedContent;
-            this.userContent1.content = combinedContent;
-          } else {
-            console.error('this.userContent is null or undefined. Unable to set content.');
-          }
-
         
+        if(data.data){
+          this.userContent = data.data;
+          this.userContent1.content= [];
+          const total = this.userContent.messages.filter(m => m.seen === false && m.userId === this.participantId);
+ 
+          if(total.length > 0){
+              
+                const  messageData: Message = {
+                 id: 0,
+                 content: '',
+                 sentAt: new Date().toISOString(),
+                 idConversation: data.data.conversationId,
+                 status: false,
+                 userId: this.participantId,
+                 seen: false
+                };
+              
+                this.userService.UpdateStatus(messageData).subscribe(
+                 (messageResponse) => {
+                 
+                             if(messageResponse.data){
+                              console.log(messageResponse, 'retornei isto');
+ 
+                              this.userContent.messages.push( messageResponse.data);
+                              
+                             }
+                 },
+                 (messageError) => {
+                   console.error('Erro ao actualizar menssages:', messageError);
+                 }
+               );
+                
+          }
+        }
+       
+       
+        //Metodo Responsavel por ordenar os dcumentos
+      this.orderingMessages_Docs(this.userContent)
+      
       },
       error => {
         console.error('Erro ao obter conteúdo do usuário:', error);
       }
     );
   }
+  orderingMessages_Docs(usercontent: UserContent){
   
+      // Criar um array combinado de mensagens e documentos
+      
+    let combinedContent: Array<{data: Document_or_Message}> = [];
+    
+  // Adicionar todas as mensagens ao array combinado
+  if (this.userContent && this.userContent.messages.length > 0) {
+    this.userContent.messages.forEach(message => {
+
+       this.messDoc = {
+          
+        id: message.id,
+        content_or_FileName: message.content,
+        sentAt_or_UploadedAt: message.sentAt,
+        idConversation: message.idConversation,
+        status: message.status,
+        userId: message.userId,
+        doawloaded: message.seen,
+        type: 'message'
+        
+
+      };
+
+      combinedContent.push({data: this.messDoc});
+
+    });
+  }
+
+  // Adicionar todos os documentos ao array combinado
+  if (this.userContent && this.userContent.documents.length > 0) {
+    this.userContent.documents.forEach(document => {
+
+      
+      this.messDoc = {
+          
+        id: document.id,
+        content_or_FileName: document.fileName,
+        sentAt_or_UploadedAt: document.uploadedAt,
+        idConversation: document.idConversation,
+        status: document.status,
+        userId: document.userId,
+        doawloaded: document.doawloaded,
+        type: 'document'  
+
+      };
+      
+      combinedContent.push({data: this.messDoc});
+    });
+  }
+
+  // Ordenar o array combinado por data de envio ou upload
+  combinedContent.sort((a, b) => {
+    let dateA: string | undefined;
+    let dateB: string | undefined;  
+
+    if (a.data.type === 'message') {
+      dateA = a.data.sentAt_or_UploadedAt;
+    } else if (a.data.type === 'document') {
+      dateA = a.data.sentAt_or_UploadedAt;
+    }
+
+    if (b.data.type === 'message') {
+      dateB = b.data.sentAt_or_UploadedAt;
+    } else if (b.data.type === 'document') {
+      dateB = b.data.sentAt_or_UploadedAt;
+    }
+
+    // Converter as datas para objetos Date e comparar
+    if (dateA && dateB) {
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    } else {
+      return 0; // Em caso de datas indefinidas, considerar como igual
+    }
+  });
+      if (this.userContent) {
+      this.userContent.content = combinedContent;
+      
+    } else {
+      if(this.userContent1){
+
+        this.userContent1.content = combinedContent;
+      }
+    }
+  
+  }
+   getGroupContent(group: number): void{
+    this.userService.GetGroupConversations(group).subscribe(
+      (data) => {
+
+            if(data.data){
+              this.userContent1 = data.data;
+              this.userContent.content= [];
+            }
+        
+
+      });
+   }
+
+  getSenderInMessageGroup(UserId: number): string {
+    const user = this.allUsers.find(u => u.id === UserId);
+    return user ? `~ ~ ${user?.firstname} ${user?.lastname}` : 'Unknown User';
+  }
 
   search(event: Event): void {
 
@@ -264,26 +396,42 @@ export class MainUIOperationsComponent implements OnInit {
     this.users = this.allUsers.filter(user => {
       return (user.firstname.toLowerCase().includes(value)) || (user.lastname.toLowerCase().includes(value));
     });
-  }
-   
-  
-  searchDoc(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    const value = target.value.toLowerCase();
 
-    this.userContent.content = this.userContent1.content.filter(doc => {
-      return (doc.data.content_or_FileName.toLowerCase().includes(value));
-    });
+    if(value === ''){
+         this.users = [];
+         this.controlChats = 'myChats'
+    }
+
   }
 
   onFileSelected(event: any): void {   
     this.selectedFile = event.target.files[0];
-  }
 
+    const fileselected = document.getElementById('fileName');
+    
+
+    if(this.selectedFile){
+      
+      if(fileselected){
+      fileselected.style.opacity = '1';
+      this.fileName1 = this.selectedFile.name
+      }
+     
+    }
+    
+  }
  
-  //Salvar Menssagem 
-  onSubmit(): void {
-    if (this.messageForm.invalid) {
+// Salvar Mensagem e/ou Documento
+onSubmit(): void {
+  // Se o formulário de mensagem estiver inválido, mas há um documento, enviar o documento mesmo assim
+
+  //Verifica se esta em um grupo ou conversa normal
+
+  if(this.messageVerify === 'normal'){
+        
+    if (this.selectedFile && this.messageForm.invalid) {
+      console.log('Formulário inválido, mas documento será enviado.');
+    } else if (this.messageForm.invalid && !this.selectedFile) {
       console.log('Formulário inválido. Verifique os campos.');
       return;
     }
@@ -291,39 +439,60 @@ export class MainUIOperationsComponent implements OnInit {
     // Criar objeto de mensagem
     const messageData: Message = {
       id: 0,
-      content: this.messageForm.get('userMessage')!.value,
+      content: this.messageForm.get('userMessage')?.value || '',
       sentAt: new Date().toISOString(),
-      idConversation: this.messageForm.get('conversationId')!.value || this.userContent?.conversationId || this.newChatId,
+      idConversation: this.messageForm.get('conversationId')?.value || this.userContent?.conversationId || this.newChatId,
       status: true,
-      userId: this.messageForm.get('userId')!.value || this.userAuthenticated || 0
+      userId: this.messageForm.get('userId')?.value || this.userAuthenticated || 0,
+      seen: false
     };
   
-    // Verificar se há um arquivo selecionado para upload
+    // Se houver um arquivo selecionado, enviar o documento
     if (this.selectedFile) {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
-      formData.append('conversationId', this.userContent?.conversationId.toString());
-      formData.append('userId', this.userAuthenticated.toString());
+      formData.append('conversationId', this.userContent?.conversationId.toString() || '');
+      formData.append('userId', this.userAuthenticated.toString() || '');
   
       // Enviar o documento
       this.userService.uploadDocument(formData).subscribe(
         (documentResponse) => {
-          console.log('Documento enviado com sucesso!', documentResponse);
-  
-          // Após enviar o documento, enviar também a mensagem
-          this.userService.UserMessage(messageData).subscribe(
-            (messageResponse) => {
-              console.log('Mensagem enviada com sucesso!', messageResponse);
-              this.getUserContent(this.userAuthenticated, this.participantId);
-              this.messageForm.reset();
-              this.selectedFile = null; // Limpar o arquivo selecionado após o envio
-  
-             
-            },
-            (messageError) => {
-              console.error('Erro ao enviar mensagem:', messageError);
-            }
-          );
+
+          this.fileName1 = '';
+          // Se houver uma mensagem, enviá-la após o envio do documento
+          if (messageData.content) {
+            this.userService.UserMessage(messageData).subscribe(
+              (messageResponse) => {
+              
+                // //Pegando a ultima menssagem
+                // const messDoc: Document_or_Message= {
+          
+                //   id: messageResponse.id,
+                //   content_or_FileName:messageResponse.content,
+                //   sentAt_or_UploadedAt: messageResponse.sentAt,
+                //   idConversation: messageResponse.idConversation,
+                //   status: messageResponse.status,
+                //   userId:  messageResponse.userId,
+                //   doawloaded: messageResponse.seen,
+                //   type: 'message'                  
+                // };
+               
+                // //Adicionando a nova Menssagem
+                // this.userContent.content.push({data: messDoc});
+
+                this.messageForm.reset();
+                this.selectedFile = null; // Limpar o arquivo selecionado após o envio
+              },
+              (messageError) => {
+                console.error('Erro ao enviar mensagem:', messageError);
+              }
+            );
+          } else {
+            // Se não houver mensagem, apenas limpar o estado
+            this.getUserContent(this.userAuthenticated, this.participantId);
+            this.messageForm.reset();
+            this.selectedFile = null; // Limpar o arquivo selecionado após o envio
+          }
         },
         (documentError) => {
           console.error('Erro ao enviar documento:', documentError);
@@ -331,45 +500,190 @@ export class MainUIOperationsComponent implements OnInit {
         }
       );
     } else {
-      // Se não houver arquivo selecionado, enviar apenas a mensagem
-      this.userService.UserMessage(messageData).subscribe(
-        (messageResponse) => {
-          console.log('Mensagem enviada com sucesso!', messageResponse);
-          this.getUserContent(this.userAuthenticated, this.participantId);
-          this.messageForm.reset();
-  
+      // Se não houver arquivo selecionado, enviar apenas a mensagem se houver
+      if (messageData.content) {
+        this.userService.UserMessage(messageData).subscribe(
+          (response) => {
+           
+            if (response.data) {
+              // Criação do objeto Document_or_Message
+              const messDoc: Document_or_Message = {
+                id: response.data.id,
+                content_or_FileName: response.data.content,
+                sentAt_or_UploadedAt: response.data.sentAt,
+                idConversation: response.data.idConversation,
+                status: response.data.status,
+                userId: response.data.userId,
+                doawloaded: response.data.seen,
+                type: 'message'
+              };
         
-        },
-        (messageError) => {
-          console.error('Erro ao enviar mensagem:', messageError);
-        }
-      );
+              // Atualização da referência do userContent
+             
+                this.userContent.content.push( { data: messDoc })
+            
+              // Optional: Forçar a detecção de mudanças se necessário
+              this.changeDetectorRef.detectChanges();
+        
+              this.clicked =true
+              this.messageVerify = 'normal'
+             
+              // Resetar o formulário
+              this.messageForm.reset();
+            } else {
+              console.error('Resposta não contém dados esperados:', response);
+            }
+          },
+          (messageError) => {
+            console.error('Erro ao enviar mensagem:', messageError);
+          }
+        );
+        
+      
+      } else {
+        console.log('Nenhum arquivo selecionado e nenhuma mensagem para enviar.');
+      }
     }
   }
-  
+  else{
+
+    if(this.messageVerify === 'group'){
+
+      if (this.selectedFile && this.messageForm.invalid) {
+        console.log('Formulário inválido, mas documento será enviado.');
+      } else if (this.messageForm.invalid) {
+        console.log('Formulário inválido. Verifique os campos.');
+        return;
+      }
+    
+      // Criar objeto de mensagem
+      const messageData: Message = {
+        id: 0,
+        content: this.messageForm.get('userMessage')?.value || '',
+        sentAt: new Date().toISOString(),
+        idConversation: this.messageForm.get('conversationId')?.value || this.userContent1?.conversationId,
+        status: true,
+        userId: this.messageForm.get('userId')?.value || this.userAuthenticated,
+        seen: false
+      };
+    
+      // Se houver um arquivo selecionado, enviar o documento
+      if (this.selectedFile) {
+        const formData = new FormData();
+        formData.append('file', this.selectedFile);
+        formData.append('conversationId', this.userContent1?.conversationId.toString() || '');
+        formData.append('userId', this.userAuthenticated.toString() || '');
+    
+        // Enviar o documento
+        this.userService.uploadDocument(formData).subscribe(
+          (documentResponse) => {
+            this.fileName1 = '';
+            // Se houver uma mensagem, enviá-la após o envio do documento
+            if (messageData.content) {
+              this.userService.UserMessage(messageData).subscribe(
+                (messageResponse) => {
+                 
+                  
+                //Pegando a ultima menssagem
+                // const messDoc: Document_or_Message= {
+          
+                //   id: messageResponse.id,
+                //   content_or_FileName:messageResponse.content,
+                //   sentAt_or_UploadedAt: messageResponse.sentAt,
+                //   idConversation: messageResponse.idConversation,
+                //   status: messageResponse.status,
+                //   userId:  messageResponse.userId,
+                //   doawloaded: messageResponse.seen,
+                //   type: 'message'                  
+                // };
+               
+                // //Adicionando a nova Menssagem
+                // this.userContent.content.push({data: messDoc});
+                  this.messageForm.reset();
+                  this.selectedFile = null; // Limpar o arquivo selecionado após o envio
+                },
+                (messageError) => {
+                  console.error('Erro ao enviar mensagem:', messageError);
+                }
+              );
+            } else {
+              // Se não houver mensagem, apenas limpar o estado
+              this.getGroupContent(this.userContent1.conversationId);
+              this.messageForm.reset();
+              this.selectedFile = null; // Limpar o arquivo selecionado após o envio
+            }
+          },
+          (documentError) => {
+            console.error('Erro ao enviar documento:', documentError);
+            alert('Erro ao enviar documento. Verifique o console para mais detalhes.');
+          }
+        );
+      } else {
+        // Se não houver arquivo selecionado, enviar apenas a mensagem se houver
+        if (messageData.content) {
+          this.userService.UserMessage(messageData).subscribe(
+            (messageResponse) => {
+            
+                //Pegando a ultima menssagem
+                // const messDoc: Document_or_Message= {
+          
+                //   id: messageResponse.id,
+                //   content_or_FileName:messageResponse.content,
+                //   sentAt_or_UploadedAt: messageResponse.sentAt,
+                //   idConversation: messageResponse.idConversation,
+                //   status: messageResponse.status,
+                //   userId:  messageResponse.userId,
+                //   doawloaded: messageResponse.seen,
+                //   type: 'message'                  
+                // };
+               
+                // //Adicionando a nova Menssagem
+                // this.userContent.content.push({data: messDoc});
+              this.messageForm.reset();
+            },
+            (messageError) => {
+              console.error('Erro ao enviar mensagem:', messageError);
+            }
+          );
+        } else {
+          console.log('Nenhum arquivo selecionado e nenhuma mensagem para enviar.');
+        }
+      }
+    }
+
+  }
+
+}
+onEnter(event: Event): void {
+  const keyboardEvent = event as KeyboardEvent; // Assegura que o evento é um KeyboardEvent
+  keyboardEvent.preventDefault();
+  this.onSubmit();
+}
+
   // Processo de salvar uma conversa
   SaveConversations(userConversation: ConversationModel): void {
     this.userService.CreateConversation(userConversation).subscribe(
       (response) => {
-        
+           if(response.data){
+            
         //Pegando o id da novca conversa
           this.newChatId = response.data
 
-        // Uma vez que em uma conversa  temos de ter no minimo duas pessoas envolvidas, segue abaixo os objectos:
-        const participant1: Participant = {
-             
-          userId: this.userAuthenticated,
-          conversationId: response.data,
-          status: true
-         }
-         
-          const participant2: Participant = {
-          
-          userId: this.participantId,
-          conversationId: response.data,
-          status: true
-         }
-
+          // Uma vez que em uma conversa  temos de ter no minimo duas pessoas envolvidas, segue abaixo os objectos:
+          const participant1: Participant = {
+               
+            userId: this.userAuthenticated,
+            conversationId: response.data,
+            status: true
+           }
+           
+            const participant2: Participant = {
+            
+            userId: this.participantId,
+            conversationId: response.data,
+            status: true
+           }
+           
          if(participant1.conversationId != 0 && participant1.userId  && participant2.conversationId != 0 && participant2.userId ){
           this.AddParticipants(participant1);
           this.AddParticipants(participant2);
@@ -378,10 +692,11 @@ export class MainUIOperationsComponent implements OnInit {
           participant1.userId = 0;
           participant2.conversationId = 0;
           participant2.userId = 0;
+           }
+
           
          }
               //Buscando os amigos
-              
          this. GetAllMyChats();
 
       },
@@ -426,6 +741,7 @@ export class MainUIOperationsComponent implements OnInit {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+         this.getUserContent(this.userAuthenticated, this.participantId)
       },
       error => {
         console.error('Error downloading document:', error);
@@ -438,20 +754,18 @@ export class MainUIOperationsComponent implements OnInit {
       this.userService.GetConversations(this.userAuthenticated).subscribe(
         userData => {
   
-          this.allConversations = userData.data;
-          //Filtrando users que não seja o que autenticou
-          this.chatWith = this.allConversations.allParticipants.filter(user => user.id !== this.userAuthenticated);
-  
-          // aqui é feito um filtro  para pegar os users que não tenho conversa com eles!
-          this.availableNewChat = this.users.filter(user =>
-            !this.chatWith.some(chatUser => chatUser.id === user.id)
-          );
-  
+            if(userData.data){
+              this.allConversations = userData.data;
+              this.conversationShow = this.allConversations.allConversation.filter(c => c.type === 'group')
+              //Filtrando users que não seja o que autenticou
+              this.chatWith = this.allConversations.allParticipants.filter(user => user.id !== this.userAuthenticated && user.status == true);  
+            }
         },
         error => {
           console.error('Erro ao obter conversas:', error);
         }
       );
   
-    }
+    } 
+
 }

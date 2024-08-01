@@ -5,4 +5,5 @@ export interface Documents {
     status: boolean;
     userId: number;
     idConversation: number;
+   doawloaded: boolean;
   }

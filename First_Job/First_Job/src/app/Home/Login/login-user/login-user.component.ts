@@ -23,8 +23,8 @@ export class LoginUserComponent implements OnInit {
     });
 
     this.userForm.patchValue({
-      email: 'holy@gmail.com',
-      password: 'holy12'
+      email: 'francio@gmail.com',
+      password: 'francio12'
     })
   }
   submit() {
@@ -41,13 +41,13 @@ export class LoginUserComponent implements OnInit {
             
             
             this.userService.SetUserAuthenticated(response.data.id);
-            this.showSuccessMessage();
+           // this.showSuccessMessage();
 
             if(response.data.acess === 'staff'){
               this.router.navigate(['/MainUI'])
             }
             else{
-              this.router.navigate(['/HomeMain'])
+              this.router.navigate(['/HomeMain/HomeNavbar'])
             }
          
           } else {

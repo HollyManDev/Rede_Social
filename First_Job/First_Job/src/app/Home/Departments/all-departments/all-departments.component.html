@@ -1,9 +1,20 @@
 <div class="MainTemplate">
 
-    <button mat-raised-button color=""  (click)="addDep()" class="btnAdd">
-      <img src="assets/Images/add.png" alt="" class="imgStyle">
-      <span > Add </span>
-    </button>
+    <div style="width: 100%; display: flex; justify-content: space-between;">
+      <button mat-raised-button color=""  (click)="addDep()" class="btnAdd">
+        <img src="assets/Images/add.png" alt="" class="imgStyle">
+        <span > Add </span>
+      </button>
+
+      <mat-form-field style="width: 20%;" appearance="outline" class="inputSearch" (input)="search($event)">
+
+        <mat-label>Search</mat-label>
+        <input matInput type="search" placeholder="ex:John" >
+    
+        </mat-form-field>
+
+    </div>
+   
   
     <table  mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 <!-- Id Column -->
@@ -47,5 +58,5 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns" style="color: white;"></tr>
       <tr mat-row *matRowDef="let departments; columns: displayedColumns;"></tr>
     </table>
-    
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
   </div>

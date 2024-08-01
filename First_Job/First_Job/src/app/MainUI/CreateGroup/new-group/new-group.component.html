@@ -1,28 +1,43 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()" style="width: 100%; display: flex;">
   <div class="header">
     <div class="search-input">
       <mat-form-field>
+        <mat-label>Search</mat-label>
         <input matInput placeholder="eg:John" (input)="search($event)">
       </mat-form-field>
     </div>
     <div class="group-name-input">
       <mat-form-field>
+        <mat-label>Group Name</mat-label>
         <input matInput placeholder="eg: Dmz Software" formControlName="groupName">
       </mat-form-field>
     </div>
-    <button mat-raised-button color="primary" type="submit" style="margin-bottom: 1.5rem;">Create Group</button>
+
+    <button mat-raised-button color="" type="submit" style="margin-bottom: 1.5rem; margin-right: 1rem;">
+
+      <img src="assets/Images/addgroup.png" alt="" class="imgStyle">
+      <span>Create Group</span>
+
+    </button>
+
+    
+      <button mat-raised-button color="" type="button"  (click)="Close()"   style="margin-bottom: 1.5rem; margin-left: 0.5rem; " class="btnCancel">
+  
+        <img src="assets/Images/cancelDept.png" alt="" class="imgStyle">
+         <span>Cancel</span>
+      </button>
+    
   </div>
+
 </form>
-
-
 
 <div class="content">
   <!-- Conteúdo rolável abaixo -->
   <div class="mainDiv">
     <div *ngFor="let user of users" class="userProfInfo">
-      <mat-checkbox (change)="getParticipant(user)" [checked]="isSelected(user)">
+      <mat-checkbox (change)="getParticipant(user)" [checked]="isSelected(user)" style="width: 100%;">
         <mat-card class="full-width-card">
-          <mat-card-content style="display: flex; gap: 1rem;">
+          <mat-card-content style="display: flex; gap: 1rem; width: 35rem;">
             <img src="assets/Images/perfil.png" class="imgUser">
             <p class="userName">{{ user.firstname + " " + user.lastname }}</p>
           </mat-card-content>
@@ -31,4 +46,5 @@
     </div>
   </div>
 </div>
+
 

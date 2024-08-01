@@ -17,12 +17,19 @@ export class CrudDepartmentComponent implements OnInit {
    depEdition!: Department; 
    userForm!: FormGroup; 
    typeButton: string = '';
+   depart: Department  [] = [];
 
   constructor( private dialogRef: MatDialogRef<CrudDepartmentComponent>,private userService: UserServiceService, private router: Router) {}
 
   ngOnInit(): void {
    
-    this.initializing();
+    this.userService.GetDepartments().subscribe(userData => {
+    
+      if(userData.data){
+        this.depart = userData.data;
+        this.depart = this.depart.filter(dep => dep.status === true);
+      }
+    });
 
     this.action = this.userService.GetActionRequired();
     this.depEdition = this.userService.GetDepartmentEdition();
@@ -91,21 +98,31 @@ export class CrudDepartmentComponent implements OnInit {
               else{
                 if(this.action === 'Add' && this.typeButton === 'Add'){
                       
-                  this.userService.CreateDepartment(depData).subscribe(
-                    
-                    (response) => {
+                  let exist = null;
+
+                   exist = this.depart.find(dep => depData.department.trim() === dep.department.trim());
+                   
+                   if(exist === null || exist === undefined){
+                        this.userService.CreateDepartment(depData).subscribe(
                         
-                      this.showSuccessMessage();
-                      
-                      location.reload();
-
-                    },
-                    (error) => {
-
-                      console.error('Erro ao criar usuário:', error);
-
-                    }
-                  );
+                          (response) => {
+                              
+                            this.showSuccessMessage();
+                            
+                            location.reload();
+      
+                          },
+                          (error) => {
+      
+                            console.error('Erro ao criar usuário:', error);
+      
+                          }
+                        );
+                   }
+                   else{
+                        this.showErrorExistMessage();
+                   }
+                
                 }
               }
     } else {
@@ -123,7 +140,7 @@ export class CrudDepartmentComponent implements OnInit {
       icon: 'success',
       title: 'Department Saved Successfully',
       showConfirmButton: false,
-      timer: 2000 // 2 segundos
+      timer: 3000 // 2 segundos
     });
   }
 
@@ -132,7 +149,7 @@ export class CrudDepartmentComponent implements OnInit {
       icon: 'success',
       title: 'Department Updated Successfully',
       showConfirmButton: false,
-      timer: 2000 // 2 segundos
+      timer: 3000 // 2 segundos
     });
   }
  showWarnMessage() {
@@ -140,7 +157,7 @@ export class CrudDepartmentComponent implements OnInit {
       icon: 'warning',
       title: 'Cannot update, make sure you have changed one place at least!',
       showConfirmButton: false,
-      timer: 2000 // 2 segundos
+      timer: 3000 // 2 segundos
     });
   }
   showErrorMessage(message: string) {
@@ -148,6 +165,15 @@ export class CrudDepartmentComponent implements OnInit {
       icon: 'error',
       title: 'Error!',
       text: message,
+      showConfirmButton: false,
+      timer: 3000 
+    });
+  }
+  
+  showErrorExistMessage() {
+    Swal.fire({
+      icon: 'error',
+      title: 'Cannot save, it is already saved!',
       showConfirmButton: false,
       timer: 2000 
     });

@@ -26,6 +26,10 @@ import { MatDialogModule } from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CrudDepartmentComponent } from './Home/Departments/DepartmentCrud/crud-department/crud-department.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { EditionComponent } from './MainUI/EditMessage/edition/edition.component';
+
+
 
 @NgModule({
   declarations: [
@@ -38,7 +42,9 @@ import { CrudDepartmentComponent } from './Home/Departments/DepartmentCrud/crud-
     AllUsersComponent,
     AllDepartmentsComponent,  
     RegisterUserComponent,
-    CrudDepartmentComponent, // Make sure to include your component here
+    CrudDepartmentComponent,
+    EditionComponent,
+  
   ],
   imports: [
     BrowserModule,
@@ -52,13 +58,15 @@ import { CrudDepartmentComponent } from './Home/Departments/DepartmentCrud/crud-
     MatOptionModule,
     MatMenuModule,
     //MatIconModule,
+    MatPaginatorModule,
     HttpClientModule,
     MatCardModule,
     MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
+    
   ],
   providers: [],
   bootstrap: [AppComponent]

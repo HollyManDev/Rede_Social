@@ -16,6 +16,7 @@ export class NewGroupComponent implements OnInit {
 
   participantUsers: User[] = [];
   users: User[] = [];
+  allUsers: User[] = [];
   userAuthenticated: number = 0;
   exist: boolean = false;
   form!: FormGroup;
@@ -28,10 +29,29 @@ export class NewGroupComponent implements OnInit {
   
   ngOnInit(): void {
     this.userAuthenticated = this.userService.GetUserAuthenticated();
-  
+   
+    const user: User = {
+      id:  this.userAuthenticated,
+      lastname: '',
+      firstname: '',
+      gender: '',
+      age: 0,
+      departmentId: 0,
+      email: '',
+      password: '',
+      status: false,
+      acess: ''
+    };
+    
+
+     this.participantUsers.push(user);
     this.userService.GetUsers().subscribe(userData => {
-      this.users = userData.data;
-      this.users = this.users.filter(u => u.id !== this.userAuthenticated);
+           
+      if(userData.data){
+        this.users = userData.data;
+        this.allUsers = userData.data;
+        this.users = this.users.filter(u => u.id !== this.userAuthenticated);
+      }
     });
 
     this.form = this.formBuilder.group({
@@ -39,12 +59,20 @@ export class NewGroupComponent implements OnInit {
     });
   }
 
+  Close(){
+
+    this.dialogRef.close();
+  }
   search(event: Event): void {
     const target = event.target as HTMLInputElement;
     const value = target.value.toLowerCase();
+    
     this.users = this.users.filter(user => {
       return (user.firstname.toLowerCase().includes(value)) || (user.lastname.toLowerCase().includes(value));
     });
+    if(value === ''){
+        this.users = this.allUsers
+    }
   }
    
   onSubmit(): void {
@@ -54,7 +82,8 @@ export class NewGroupComponent implements OnInit {
         id: 0,
         title: this.form.value.groupName, // Acessando o valor do campo 'groupName'
         createdAt: new Date().toISOString(),
-        status: true
+        status: true,
+        type: 'group'
       };
 
       // Salvar a conversa
@@ -88,10 +117,17 @@ export class NewGroupComponent implements OnInit {
   SaveConversations(userConversation: ConversationModel): void {
     this.userService.CreateConversation(userConversation).subscribe(
       (response) => {
-        // Pegando o ID da nova conversa
+          if(response.data){
+             // Pegando o ID da nova conversa
         const conversationId = response.data;
         // Adicionando os participantes à conversa
+       
+        
+     
+     console.log('All users', this.participantUsers)
+
         this.participantUsers.forEach(user => {
+          
           const participant: Participant = {
             userId: user.id,
             conversationId: conversationId,
@@ -103,7 +139,8 @@ export class NewGroupComponent implements OnInit {
 
           this.showSuccessMessage1();
         // Fechando o modal após salvar a conversa
-        this.dialogRef.close();
+            this.dialogRef.close();
+          }
       },
       (error) => {
         console.error('Erro ao criar conversa:', error);
@@ -125,7 +162,7 @@ export class NewGroupComponent implements OnInit {
   showSuccessMessage1() {
     Swal.fire({
       icon: 'success',
-      title: 'Department Updated Successfully',
+      title: 'Group Created Successfully',
       showConfirmButton: false,
       timer: 2000 // 2 segundos
     });

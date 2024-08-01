@@ -11,6 +11,8 @@ import { ConversationModel } from '../Models/Conversation';
 import { UsersConversationsParticipants } from '../Models/usersConversationsParticipants';
 import { Participant } from '../Models/ConversationParticipant';
 import { Department } from '../Models/Department';
+import Groups from '../Models/Group';
+import { Document_or_Message } from '../Models/Document_or_Message';
 
 @Injectable({  
   providedIn: 'root'
@@ -22,6 +24,8 @@ export class UserServiceService {
   private action: string = '';
   private users!: User;
   private dep!: Department;
+  private message!: Document_or_Message;
+ 
 
   private apiUrl = `${environment.ApiUrl}`
   
@@ -49,6 +53,7 @@ export class UserServiceService {
     return this.http.put<Response<User[]>>(`${this.apiUrl}User`, userdata);
  
    }
+
      
    DeleteUser(user: User) : Observable<Response<User[]>>{
 
@@ -80,10 +85,22 @@ export class UserServiceService {
  
    }
     
-  UserMessage(userMessage: Message): Observable<Message> {
+  UserMessage(userMessage: Message): Observable<Response<Message>> {
 
-    return this.http.post<Message>(`${this.apiUrl}Message`, userMessage);
+    return this.http.post<Response<Message>>(`${this.apiUrl}Message`, userMessage);
   }
+
+  UpdateMessage(messageData: Message) : Observable<Response<Message>>{
+
+    return this.http.put<Response<Message>>(`${this.apiUrl}Message`, messageData);
+ 
+   }
+  
+   UpdateStatus(messageData: Message) : Observable<Response<Message>>{
+
+    return this.http.put<Response<Message>>(`${this.apiUrl}Message/changeStatus`, messageData);
+ 
+   }
   
   SetUserAuthenticated(id: number): void{
      
@@ -114,6 +131,16 @@ export class UserServiceService {
      
     return this.users;
   }
+  SetMessageEdition(messageEdition: Document_or_Message ): void{
+     
+    this.message = messageEdition;
+  }
+  
+  GetMessageEdition(): Document_or_Message{
+     
+    return this.message;
+  }
+  
   
   SetDepartmentEdition(depEdition: Department): void{
      
@@ -150,6 +177,11 @@ export class UserServiceService {
    GetConversations(userId: number) : Observable<Response<UsersConversationsParticipants>>{
 
     return this.http.get<Response< UsersConversationsParticipants>>(`${this.apiUrl}UserConversationParticipant/User/${userId}/ConversationsWithParticipants`);
+    
+   }
+   GetGroupConversations(userId: number) : Observable<Response<Groups>>{
+
+    return this.http.get<Response<Groups>>(`${this.apiUrl}UserContent/${userId}/GroupContent`);
     
    }
 

@@ -6,5 +6,5 @@ export interface  Document_or_Message{
         status: boolean;
         userId: number;
         type: string;
-      
+        doawloaded: boolean;
 }

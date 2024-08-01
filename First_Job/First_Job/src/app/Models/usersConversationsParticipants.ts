@@ -4,6 +4,6 @@ import { User } from "./UserModel";
 
 export interface UsersConversationsParticipants {
  
-    allConversations1: ConversationModel []; // Corrigido para allConversations
+    allConversation: ConversationModel []; // Corrigido para allConversations
     allParticipants: User[];
 }

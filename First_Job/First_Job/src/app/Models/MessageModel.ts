@@ -5,5 +5,5 @@ export interface Message {
     idConversation: number;
     status: boolean;
     userId: number;
-   
+    seen: boolean;
   }  

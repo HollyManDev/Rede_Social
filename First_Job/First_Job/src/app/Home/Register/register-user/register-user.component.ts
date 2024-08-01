@@ -34,8 +34,11 @@ export class RegisterUserComponent implements OnInit {
     this.userEdition = this.userService.GetUserEdition();
 
       this.userService.GetDepartments().subscribe(userData => {
-      this.departments = userData.data;
-      this.departments = this.departments.filter(dep => dep.status === true);
+     
+        if(userData.data){
+          this.departments = userData.data;
+          this.departments = this.departments.filter(dep => dep.status === true);
+        }
      
       if(this.userEdition){
         this.depName = this.getDepFromUser(this.userEdition.departmentId);

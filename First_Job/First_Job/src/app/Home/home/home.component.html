@@ -9,23 +9,37 @@
 
     <div class="navBarLinks">
 
-        <ul class="navBarOption">
-            
-            <li>  <a class="linknavBar"> 
-                <img src="assets/Images/home.png" alt="" class="imgStyle">
-                <span>Home</span></a>   
-                
-            </li>
-            <li><a routerLink =""> Galery </a></li>
-            <li> <a routerLink =""  class="linknavBar"> Products </a></li>
-            <li><a routerLink ="" class="linknavBar" > About us </a></li>
         
-        </ul>
-
         <div class="buttonNavBar">
 
-            <button mat-raised-button  routerLink ="/HomeMain/AllDepartments"> Departments</button>
-            <button mat-raised-button  routerLink ="/HomeMain/AllUsers" > Collaborators</button>
+            <button mat-raised-button  routerLink ="/HomeMain" > 
+
+                <img src="assets/Images/home.png" alt="" class="imgStyle">
+                <span>Home</span>
+
+            </button>
+
+            <button mat-raised-button  routerLink ="/HomeMain/AllDepartments">
+
+                <img src="assets/Images/department.png" alt="" class="imgStyle">
+                <span>Department</span>
+
+
+            </button>
+
+            <button mat-raised-button  routerLink ="/HomeMain/AllUsers" > 
+
+                <img src="assets/Images/collaborators.png" alt="" class="imgStyle">
+                <span>Collaborators</span>
+
+            </button>
+
+            <button mat-raised-button  routerLink ="/Login" > 
+
+                <img src="assets/Images/logout.png" alt="" class="imgStyle">
+                <span>Logout</span>
+
+            </button>
            
         </div>
 

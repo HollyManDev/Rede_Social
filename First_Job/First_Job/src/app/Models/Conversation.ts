@@ -3,4 +3,5 @@ export interface ConversationModel{
    title: string;
    createdAt: string;
    status: boolean;
+   type: string;
 }

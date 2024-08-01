@@ -1,0 +1,20 @@
+<form class="FormLogin" [formGroup]="messageForm" (ngSubmit)="submit()" #formDit="ngForm">
+    <p class="headerLogin">Edit Message</p>
+  
+    <mat-form-field appearance="fill" class="inputLogin">
+      <mat-label>Message</mat-label>
+      <input matInput type="text" placeholder="" formControlName="message" required>
+    </mat-form-field>
+  
+    <div class="btnForm">
+      <button mat-raised-button class="buttonLoginForm cancel" (click)="Close()" type="button">
+        <img src="assets/Images/cancelDept.png" alt="" class="imgStyle">
+        <span>Cancel</span>
+      </button>
+      <button mat-raised-button class="buttonLoginForm login" type="submit">
+        <img src="assets/Images/editDept.png" alt="" class="imgStyle">
+        <span>Save</span>
+      </button>
+    </div>
+  </form>
+  
