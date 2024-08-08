@@ -132,11 +132,11 @@
 
           
             <mat-card style="width: 100%; " class=" profile ">
-                <mat-card-content style=" width: 100%;  display: flex; justify-content: space-between;">
+                <mat-card-content style=" width: 100%;  display: flex; justify-content: space-between;  background-color: rgb(0, 26,49); margin-right: 0.5rem;">
                  
                   <div style="display: flex; gap: 1rem; width: 50%;" >
-                    <img src="assets/Images/perfil.png" class="imgUser">
-                    <p class="userName">{{selectedUser}}</p>
+                    <img src="assets/Images/perfilMain.png" class="imgUser">
+                    <p class="userName" style="color: rgba(255, 255, 255);">{{selectedUser}}</p>
                   </div> 
       
                 </mat-card-content>
@@ -145,7 +145,7 @@
         </div>  
 
         <div class="Messages">
-          <div *ngIf="clicked === true && (userContent?.content || userContent1?.content)"
+          <div *ngIf="clicked  && (userContent?.content?.length || userContent1?.content?.length)"
                style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
         
             <!-- Verificação de mensagens normais -->
@@ -156,7 +156,7 @@
                 <!-- Mensagem do usuário autenticado -->
                 <ng-container *ngIf="item.data.type === 'message' && item.data.userId === userAuthenticated">
                   <mat-card
-                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem; background-color: rgba(172, 243, 172, 0.726);">
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 40rem; background-color: rgba(172, 243, 172, 0.726);">
                     <mat-card-content>
                       <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;">
                         {{ item.data.content_or_FileName }}
@@ -167,8 +167,8 @@
                         </button>
                         <mat-menu #menu="matMenu">
                           <button mat-menu-item (click)="openModalEdit(item.data)">Edit Message</button>
-                          <button mat-menu-item>Delete</button>
-                          <button mat-menu-item routerLink="">Forward</button>
+                          <button mat-menu-item (click)=" DeleteMessage_Document(item.data)" >Delete</button>
+                          <button mat-menu-item (click)=" openModalFoward(item.data)">Forward</button>
                         </mat-menu>
                       </div>
                       <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
@@ -201,8 +201,8 @@
                       </div>
                       <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
                         {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
-                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
-                        style="width: 20px; height: 20px; margin-left: 2px;">
+                             <img src="assets/Images/itsSeen.png" alt="Options"
+                             style="width: 20px; height: 20px; margin-left: 2px;">
                       </small>
                     </mat-card-content>
                   </mat-card>
@@ -212,7 +212,7 @@
                 <ng-container *ngIf="item.data.type === 'document' && item.data.userId === userAuthenticated">
                   <mat-card
                     [style.background-color]="'rgba(172, 243, 172, 0.726)'"
-                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem;">
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 40rem;">
                     <mat-card-content>
                       <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;"
                            class="OtherUserDoc">
@@ -223,7 +223,7 @@
                           </mat-icon>
                         </button>
                         <mat-menu #menu="matMenu">
-                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item (click)=" DeleteMessage_Document(item.data)">Delete</button>
                           <button mat-menu-item routerLink="">Forward</button>
                         </mat-menu>
                       </div>
@@ -277,7 +277,7 @@
                 <!-- Mensagem do usuário autenticado -->
                 <ng-container *ngIf="item.data.type === 'message' && item.data.userId === userAuthenticated">
                   <mat-card
-                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem; background-color: rgba(172, 243, 172, 0.726);">
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 40rem; background-color: rgba(172, 243, 172, 0.726);">
                     <mat-card-content>
                       <div style="font-size: 18px; display: flex; justify-content: space-between; align-items: center;">
                         {{ item.data.content_or_FileName }}
@@ -288,12 +288,16 @@
                         </button>
                         <mat-menu #menu="matMenu">
                           <button mat-menu-item (click)="openModalEdit(item.data)">Edit Message</button>
-                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item (click)=" DeleteMessage_Document(item.data)">Delete</button>
                           <button mat-menu-item routerLink="">Forward</button>
                         </mat-menu>
                       </div>
                       <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
                         {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img *ngIf="item.data.doawloaded === false" src="assets/Images/afterSending.png" alt="Options"
+                        style="width: 20px; height: 20px; margin-left: 2px;">
+                        <img *ngIf="item.data.doawloaded === true" src="assets/Images/itsSeen.png" alt="Options"
+                        style="width: 20px; height: 20px; margin-left: 2px;">
                       </small>
                     </mat-card-content>
                   </mat-card>
@@ -318,6 +322,8 @@
                       </div>
                       <small style="display: flex; justify-content: flex-end; padding-top: 0.5rem;">
                         {{ item.data.sentAt_or_UploadedAt | date:'HH:mm' }}
+                        <img src="assets/Images/itsSeen.png" alt="Options"
+                        style="width: 20px; height: 20px; margin-left: 2px;">
                       </small>
                     </mat-card-content>
                   </mat-card>
@@ -327,7 +333,7 @@
                 <ng-container *ngIf="item.data.type === 'document' && item.data.userId === userAuthenticated">
                   <mat-card
                     [style.background-color]="'rgba(172, 243, 172, 0.726)'"
-                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 30rem;">
+                    style="margin-right: 4rem; border-radius: 10px; margin-bottom: 0.5rem; margin-left: 40rem;">
                     <mat-card-content>
                       <div style="font-size: 16px; display: flex; justify-content: space-between; align-items: center;"
                            class="OtherUserDoc">
@@ -338,7 +344,7 @@
                           </mat-icon>
                         </button>
                         <mat-menu #menu="matMenu">
-                          <button mat-menu-item>Delete</button>
+                          <button mat-menu-item (click)=" DeleteMessage_Document(item.data)">Delete</button>
                           <button mat-menu-item routerLink="">Forward</button>
                         </mat-menu>
                       </div>
@@ -402,7 +408,7 @@
                    
                <div style="width: 95%;  display: flex; flex-direction: column;">
 
-                <p style="margin-left: 0.5rem; opacity: 0; margin-bottom: 0.5rem; " id="fileName"  >{{fileName1}}</p>
+                <p style="margin-left: 0.5rem; opacity: 0; margin-bottom: 0.5rem;" id="fileName"  >{{fileName1}}</p>
 
                 <mat-form-field style="width: 100%; height: 6rem;">
                   <mat-label>Type here!</mat-label>

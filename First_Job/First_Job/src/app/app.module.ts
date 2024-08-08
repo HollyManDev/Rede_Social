@@ -28,6 +28,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CrudDepartmentComponent } from './Home/Departments/DepartmentCrud/crud-department/crud-department.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { EditionComponent } from './MainUI/EditMessage/edition/edition.component';
+import { ForwardComponent } from './MainUI/Foward/forward/forward.component';
 
 
 
@@ -44,6 +45,7 @@ import { EditionComponent } from './MainUI/EditMessage/edition/edition.component
     RegisterUserComponent,
     CrudDepartmentComponent,
     EditionComponent,
+    ForwardComponent,
   
   ],
   imports: [

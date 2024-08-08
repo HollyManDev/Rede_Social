@@ -13,6 +13,7 @@ import { Participant } from '../Models/ConversationParticipant';
 import { Department } from '../Models/Department';
 import Groups from '../Models/Group';
 import { Document_or_Message } from '../Models/Document_or_Message';
+import { Documents } from '../Models/Document';
 
 @Injectable({  
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class UserServiceService {
 
   private idUSER: number = 0;
   private action: string = '';
+  private type: string = '';
   private users!: User;
   private dep!: Department;
   private message!: Document_or_Message;
@@ -101,6 +103,23 @@ export class UserServiceService {
     return this.http.put<Response<Message>>(`${this.apiUrl}Message/changeStatus`, messageData);
  
    }
+   DeleteMessage(messageData: Message) : Observable<Response<Message>>{
+    
+    return this.http.put<Response<Message>>(`${this.apiUrl}Message/Inactivate`, messageData);
+ 
+   }
+
+   DeleteDocument(documentData: Documents) : Observable<Response<Documents>>{
+    
+    return this.http.put<Response<Documents>>(`${this.apiUrl}Document/Inactivate`, documentData);
+ 
+   }
+   
+   UpdateStatusGroup(messageData: Message) : Observable<Response<Message>>{
+
+    return this.http.put<Response<Message>>(`${this.apiUrl}Message/changeStatusGroup`, messageData);
+ 
+   }
   
   SetUserAuthenticated(id: number): void{
      
@@ -111,6 +130,7 @@ export class UserServiceService {
      
     return this.idUSER;
   }
+ 
 
    SetActionRequired(actionreq: string): void{
      
@@ -158,6 +178,7 @@ export class UserServiceService {
   }
 
   uploadDocument(formData: FormData): Observable<any> {
+  
     return this.http.post<any>(`${this.apiUrl}Document/upload`, formData);
   }
   
@@ -179,6 +200,9 @@ export class UserServiceService {
     return this.http.get<Response< UsersConversationsParticipants>>(`${this.apiUrl}UserConversationParticipant/User/${userId}/ConversationsWithParticipants`);
     
    }
+   GetConversationId(p: Participant): Observable<Response<number>> {
+    return this.http.post<Response<number>>(`${this.apiUrl}Participants/peguei`, p);
+  }
    GetGroupConversations(userId: number) : Observable<Response<Groups>>{
 
     return this.http.get<Response<Groups>>(`${this.apiUrl}UserContent/${userId}/GroupContent`);

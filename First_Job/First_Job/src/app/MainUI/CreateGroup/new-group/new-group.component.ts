@@ -130,6 +130,7 @@ export class NewGroupComponent implements OnInit {
           
           const participant: Participant = {
             userId: user.id,
+            participantId: 0,
             conversationId: conversationId,
             status: true
           };

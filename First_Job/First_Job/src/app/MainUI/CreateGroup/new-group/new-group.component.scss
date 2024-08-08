@@ -20,8 +20,6 @@
  }
  
  .content {
- 
-   overflow-y: auto; /* Habilita scroll vertical se necessário */
    height: calc(100vh - 80px); /* Altura ajustada para o conteúdo rolável */
    padding: 10px;
  }
@@ -69,6 +67,21 @@ span{
 }
 button:hover{
   background-color: rgb(0,26,49);
+  color: white;
+  transition: 1s all  ease-in-out;
+  text-align: center;
+  
+  .imgStyle{
+      display: none;
+      
+  }
+  span{
+      display: flex;
+  }
+}
+
+.btnCancel:hover{
+  background-color: red;
   color: white;
   transition: 1s all  ease-in-out;
   text-align: center;

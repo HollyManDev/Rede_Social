@@ -23,12 +23,21 @@ export class RegisterUserComponent implements OnInit {
   dep!: Department;
   depName: string = '';
   deptId: number = 0;
+  users: User [] =  [];
 
   constructor(private userService: UserServiceService, private router: Router) {}
 
   ngOnInit(): void {
     
     this.initializeUserFormForAdd();
+    
+    this.userService.GetUsers().subscribe(userData => {
+
+      if(userData.data){
+        this.users = userData.data;
+       
+      }
+  });
 
     this.action = this.userService.GetActionRequired();
     this.userEdition = this.userService.GetUserEdition();
@@ -116,22 +125,33 @@ export class RegisterUserComponent implements OnInit {
                    
           userData.departmentId = this.dep.id;
           userData.acess = 'staff';
+           
+          const exist = this.users.find(u => u.email === userData.email);
+             
+                    if(exist === null){
+                      
+                        
+                          this.userService.CreateUser(userData).subscribe(
+                        
+                            (response) => {
+                                
+                              this.showSuccessMessage();
+                              
+                              this.router.navigate(['/HomeMain/AllUsers'])
+                    
+                            },
+                            (error) => {
+                    
+                              console.error('Erro ao criar usuário:', error);
+                    
+                            }
+                          );
+                    }
+                    else{
 
-          this.userService.CreateUser(userData).subscribe(
-        
-            (response) => {
-                
-              this.showSuccessMessage();
-              
-              this.router.navigate(['/HomeMain/AllUsers'])
-    
-            },
-            (error) => {
-    
-              console.error('Erro ao criar usuário:', error);
-    
-            }
-          );
+                           this.showWarningEmail();
+
+                    }
         }
         else{
 
@@ -152,21 +172,29 @@ export class RegisterUserComponent implements OnInit {
                       //Aqui estou passando o id do departamento que foi selecionado no frontEnd
                         userData.departmentId = this.deptId;
                         userData.acess = 'staff';
+
+                        const exist = this.users.find(u => u.email === userData.email);
                         
-                      this.userService.UpdateUser(userData).subscribe(
+                           if(exist === null){
+                                
+                            this.userService.UpdateUser(userData).subscribe(
         
-                        (response) => {
-                        
-                          this.router.navigate(['/HomeMain/AllUsers']);
-                          this.showSuccessMessage1();
-                
-                        },
-                        (error) => {
-                
-                          console.error('Erro ao Editaruser:', error);
-                
-                        }
-                      );
+                              (response) => {
+                              
+                                this.router.navigate(['/HomeMain/AllUsers']);
+                                this.showSuccessMessage1();
+                      
+                              },
+                              (error) => {
+                      
+                                console.error('Erro ao Editaruser:', error);
+                      
+                              }
+                            );
+                           }
+                           else{
+                                   this.showWarningEmail();
+                           }
         
                     }
                     
@@ -231,6 +259,13 @@ export class RegisterUserComponent implements OnInit {
       timer: 3000 // Tempo em milissegundos (2 segundos)
     });
   }
-  
+   showWarningEmail() {
+    Swal.fire({
+      icon: 'warning', 
+      title: 'try another email, this one already exist!',
+      showConfirmButton: false,
+      timer: 3000 // Tempo em milissegundos (2 segundos)
+    });
+  }
   
 }

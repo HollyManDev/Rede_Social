@@ -1,0 +1,32 @@
+<div class="content">
+    <div class="search-input">
+      <mat-form-field appearance="fill" class="search-field">
+        <mat-label>Search</mat-label>
+        <input matInput placeholder="eg: John" (input)="search($event)">
+      </mat-form-field>
+      <button mat-button color="primary" (click)="Send()">
+        <img src="assets/Images/Ressend.png" alt="" class="imgStyle">
+        <span>Send</span>
+  
+      </button>
+      <button mat-button color="accent" (click)="Close()" class="btnCancel">
+        <img src="assets/Images/cancelDept.png" alt="" class="imgStyle">
+        <span>Cancel</span>
+      </button>
+    </div>
+  
+    <!-- Conteúdo rolável abaixo -->
+    <div class="mainDiv">
+      <div *ngFor="let user of users" class="userProfInfo" style="width: 100%;">
+        <mat-checkbox class="full-width-checkbox"  (change)="getParticipant(user)" [checked]="isSelected(user)">
+          <mat-card class="full-width-card">
+            <mat-card-content class="card-content">
+              <img src="assets/Images/perfil.png" alt="User Image" class="imgUser">
+              <p class="userName">{{ user.firstname + " " + user.lastname }}</p>
+            </mat-card-content>
+          </mat-card>
+        </mat-checkbox>
+      </div>
+    </div>
+  </div>
+  
