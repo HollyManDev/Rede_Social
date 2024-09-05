@@ -128,7 +128,7 @@ export class RegisterUserComponent implements OnInit {
            
           const exist = this.users.find(u => u.email === userData.email);
              
-                    if(exist === null){
+                    if(exist === null || exist === undefined){
                       
                         
                           this.userService.CreateUser(userData).subscribe(
@@ -173,9 +173,9 @@ export class RegisterUserComponent implements OnInit {
                         userData.departmentId = this.deptId;
                         userData.acess = 'staff';
 
-                        const exist = this.users.find(u => u.email === userData.email);
+                        const exist = this.users.find(u => u.email === userData.email && u.id !== userData.id);
                         
-                           if(exist === null){
+                           if(exist === null || exist === undefined){
                                 
                             this.userService.UpdateUser(userData).subscribe(
         
@@ -193,6 +193,7 @@ export class RegisterUserComponent implements OnInit {
                             );
                            }
                            else{
+                
                                    this.showWarningEmail();
                            }
         
