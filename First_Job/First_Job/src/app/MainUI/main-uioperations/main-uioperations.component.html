@@ -152,7 +152,7 @@
             <div *ngIf="messageVerify === 'normal'"
                  style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
               <div *ngFor="let item of (userContent?.content || [])">
-        
+             
                 <!-- Mensagem do usuário autenticado -->
                 <ng-container *ngIf="item.data.type === 'message' && item.data.userId === userAuthenticated">
                   <mat-card
@@ -167,7 +167,8 @@
                         </button>
                         <mat-menu #menu="matMenu">
                           <button mat-menu-item (click)="openModalEdit(item.data)">Edit Message</button>
-                          <button mat-menu-item (click)=" DeleteMessage_Document(item.data)" >Delete</button>
+                          <button mat-menu-item (click)=" DeleteMessage_Document(item.data)" >Delete for everyone</button>
+                          <button mat-menu-item (click)=" DeleteForMe(item.data)" >Delete for me</button>
                           <button mat-menu-item (click)=" openModalFoward(item.data)">Forward</button>
                         </mat-menu>
                       </div>
@@ -419,7 +420,7 @@
 
                 <div style="margin-top: 2.5rem; margin-right: 1.3rem;">
                   <button type="submit" style="border: none; background-color: white; margin-left: 0.5rem;"> 
-                    <img src="assets/Images/Send.png" alt="Send" class="imgStyle">
+                    <img src="assets/Images/send.png" alt="Send" class="imgStyle">
                   </button>
                 </div>
 

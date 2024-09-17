@@ -71,7 +71,7 @@ export class NewGroupComponent implements OnInit {
       return (user.firstname.toLowerCase().includes(value)) || (user.lastname.toLowerCase().includes(value));
     });
     if(value === ''){
-        this.users = this.allUsers
+        this.users = this.allUsers.filter(u => u.id !== this.userAuthenticated);
     }
   }
    

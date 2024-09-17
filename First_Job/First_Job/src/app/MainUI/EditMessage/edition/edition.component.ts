@@ -42,6 +42,7 @@ export class EditionComponent {
         sentAt: new Date().toISOString(),
         idConversation: this.message.idConversation,
         status: this.message.status,
+        myStatus: this.message.myStatus,
         seen: false,
         userId: this.message.userId
       } 
@@ -58,6 +59,7 @@ export class EditionComponent {
                 sentAt_or_UploadedAt: response.data.sentAt,
                 idConversation:  response.data.idConversation,
                 status:  response.data.status,
+                myStatus: response.data.myStatus,
                 userId:  response.data.userId,
                 doawloaded: response.data.seen,
                 type: 'message'

@@ -4,7 +4,8 @@ export interface Documents {
     fileName: string;
     uploadedAt: string;
     status: boolean;
+    myStatus: boolean;
     userId: number;
     idConversation: number;
-   doawloaded: boolean;
+    doawloaded: boolean;
   }

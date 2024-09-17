@@ -86,6 +86,7 @@ export class ForwardComponent {
                       sentAt: new Date().toISOString(),
                       idConversation: this.conversationId,
                       status: true,
+                      myStatus: false,
                       userId: this.message.userId,
                       seen: false
            }

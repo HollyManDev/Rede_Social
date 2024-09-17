@@ -116,6 +116,7 @@ export class MainUIOperationsComponent implements OnInit {
       sentAt: i.sentAt_or_UploadedAt,
       idConversation: i.idConversation,
       status: false,
+      myStatus: i.myStatus,
       userId: i.userId,
       seen: i.doawloaded
     }
@@ -150,6 +151,7 @@ export class MainUIOperationsComponent implements OnInit {
         uploadedAt: i.sentAt_or_UploadedAt,
         idConversation: i.idConversation,
         status: false,
+        myStatus: i.myStatus,
         userId: i.userId,
         doawloaded: i.doawloaded
       }
@@ -177,9 +179,8 @@ export class MainUIOperationsComponent implements OnInit {
       );
     }
   }
-  
-   
   }
+  
 
   onMouseLeave(){
     let docs = document.getElementById('docOther');
@@ -266,6 +267,30 @@ export class MainUIOperationsComponent implements OnInit {
     });
   }
 
+  DeleteForMe(i: Document_or_Message):void{
+    console.log(i, 'meus dados')
+    const messageData: Message = {  
+      id: i.id,
+      content: i.content_or_FileName,
+      sentAt: i.sentAt_or_UploadedAt,
+      idConversation: i.idConversation,
+      status: false,
+      myStatus: i.myStatus,
+      userId: i.userId,
+      seen: i.doawloaded
+    }
+  
+    this.userService.DeleteForMe(messageData).subscribe(
+      (response) => {
+       
+       
+      },
+      (error) => {
+        console.error('Erro ao Deletar para mim!:', error);
+      }
+    );
+  }
+  
   newChat(): void{
      this.controlChats = true;
      this.GetAllMyChats();
@@ -499,6 +524,7 @@ export class MainUIOperationsComponent implements OnInit {
               sentAt: new Date().toISOString(),
               idConversation: this.userContent.conversationId,
               status: false,
+              myStatus: false,
               userId: this.participantId,
               seen: false
             };
@@ -539,6 +565,7 @@ export class MainUIOperationsComponent implements OnInit {
           sentAt_or_UploadedAt: message.sentAt,
           idConversation: message.idConversation,
           status: message.status,
+          myStatus: message.myStatus,
           userId: message.userId,
           doawloaded: message.seen,
           type: 'message'
@@ -557,6 +584,7 @@ export class MainUIOperationsComponent implements OnInit {
           sentAt_or_UploadedAt: document.uploadedAt,
           idConversation: document.idConversation,
           status: document.status,
+          myStatus: document.myStatus,
           userId: document.userId,
           doawloaded: document.doawloaded,
           type: 'document'
@@ -582,6 +610,7 @@ export class MainUIOperationsComponent implements OnInit {
     // Atualizar o conteúdo
     if (this.messageVerify === 'normal') {
       userContent.content = combinedContent;
+   
     } else if (this.messageVerify === 'group') {
       // Atualizar conteúdo alternativo se necessário
       this.userContent1.content = combinedContent;
@@ -608,6 +637,7 @@ export class MainUIOperationsComponent implements OnInit {
               sentAt: new Date().toISOString(),
               idConversation: this.userContent1.conversationId,
               status: false,
+              myStatus: false,
               userId: this.userAuthenticated,
               seen: false
             };
@@ -1276,6 +1306,7 @@ onSubmit(): void {
     sentAt: new Date().toISOString(),
     idConversation: this.messageForm.get('conversationId')?.value || this.userContent?.conversationId || this.userContent1?.conversationId,
     status: true,
+    myStatus: false,
     userId: this.messageForm.get('userId')?.value || this.userAuthenticated || 0,
     seen: false
   };
@@ -1303,6 +1334,7 @@ onSubmit(): void {
               sentAt_or_UploadedAt: response.data.sentAt,
               idConversation: response.data.idConversation,
               status: response.data.status,
+              myStatus: response.data.myStatus,
               userId: response.data.userId,
               doawloaded: response.data.seen,
               type: 'message'
@@ -1347,6 +1379,7 @@ onSubmit(): void {
             sentAt_or_UploadedAt: documentResponse.data.uploadedAt || 'Data não disponível', // Verifique se uploadedAt está correto
             idConversation: this.messageForm.get('conversationId')?.value || this.userContent?.conversationId ,
             status: documentResponse.data.status,
+            myStatus: documentResponse.data.myStatus,
             userId: this.userAuthenticated,
             doawloaded: documentResponse.data.doawloaded, // Ajuste se necessário
             type: 'document'
@@ -1380,6 +1413,7 @@ onSubmit(): void {
     sentAt: new Date().toISOString(),
     idConversation: this.messageForm.get('conversationId')?.value || this.userContent1?.conversationId,
     status: true,
+    myStatus: false,
     userId: this.messageForm.get('userId')?.value || this.userAuthenticated || 0,
     seen: false
   };
@@ -1407,6 +1441,7 @@ onSubmit(): void {
               sentAt_or_UploadedAt: response.data.sentAt,
               idConversation: response.data.idConversation,
               status: response.data.status,
+              myStatus: response.data.myStatus,
               userId: response.data.userId,
               doawloaded: response.data.seen,
               type: 'message'
@@ -1451,6 +1486,7 @@ onSubmit(): void {
             sentAt_or_UploadedAt: documentResponse.data.uploadedAt || 'Data não disponível', // Verifique se uploadedAt está correto
             idConversation: this.messageForm.get('conversationId')?.value || this.userContent1?.conversationId ,
             status: documentResponse.data.status,
+            myStatus: documentResponse.data.myChats,
             userId: this.userAuthenticated,
             doawloaded: documentResponse.data.doawloaded, // Ajuste se necessário
             type: 'document'

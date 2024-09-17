@@ -4,6 +4,8 @@ export interface Message {
     sentAt: string;
     idConversation: number;
     status: boolean;
+    myStatus: boolean;
     userId: number;
     seen: boolean;
+
   }  

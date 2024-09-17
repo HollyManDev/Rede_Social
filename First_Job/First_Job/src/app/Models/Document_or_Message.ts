@@ -4,6 +4,7 @@ export interface  Document_or_Message{
         sentAt_or_UploadedAt: string;
         idConversation: number;
         status: boolean;
+        myStatus: boolean;
         userId: number;
         type: string;
         doawloaded: boolean;

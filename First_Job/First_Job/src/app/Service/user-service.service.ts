@@ -103,6 +103,12 @@ export class UserServiceService {
     return this.http.put<Response<Message>>(`${this.apiUrl}Message/changeStatus`, messageData);
  
    }
+   
+   DeleteForMe(messageData: Message) : Observable<Response<Message>>{
+
+    return this.http.put<Response<Message>>(`${this.apiUrl}Message/changeMyStatus`, messageData);
+ 
+   }
    DeleteMessage(messageData: Message) : Observable<Response<Message>>{
     
     return this.http.put<Response<Message>>(`${this.apiUrl}Message/Inactivate`, messageData);
